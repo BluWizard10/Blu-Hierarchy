@@ -1,7 +1,9 @@
 {
     "name": "BluHierarchy.Editor",
     "rootNamespace": "BluWizard",
-    "references": [],
+    "references": [
+        "BluHierarchy"
+    ],
     "includePlatforms": [
         "Editor"
     ],
