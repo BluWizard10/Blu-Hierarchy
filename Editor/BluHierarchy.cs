@@ -154,6 +154,125 @@ namespace BluWizard.Hierarchy
                     currentX -= iconSize + 2; // icon size plus some padding
                 }
             }
+
+            // Draw Layer Name if not Default
+            DrawLayerText(go, selectionRect);
+
+        }
+
+        //--------- SHOW LAYERS AS TEXT NEXT TO GAMEOBJECT ----------
+        private static void DrawLayerText(GameObject go, Rect selectionRect)
+        {
+            // Only procedd if the GameObject is not on the Default Layer
+            if (go.layer != LayerMask.NameToLayer("Default"))
+            {
+                if (go.layer != LayerMask.NameToLayer("Default"))
+                {
+                    // Create a new GUIStyle for the hierarchy layer text to avoid affecting other EditorStyles
+                    GUIStyle style = new GUIStyle(EditorStyles.label)
+                    {
+                        fontStyle = FontStyle.Italic,
+                        normal = { textColor = Color.grey }, // Default Text Color
+                        hover = { textColor = Color.grey } // Prevent color change on hover by setting the hover state color to the same as normal
+                    };
+
+                    // Calculate the width of the GameObject's name using the style
+                    GUIContent content = new GUIContent(go.name);
+                    float nameWidth = style.CalcSize(content).x;
+
+                    // Calculate an offset to add some space between the GameObject's name and the layer text
+                    float offset = 20; // You can adjust this value for more or less spacing
+
+                    // Calculate the position for the layer text to appear right after the GameObject's name
+                    Rect layerTextRect = new Rect(selectionRect.x + nameWidth + offset, selectionRect.y, selectionRect.width - nameWidth - offset, selectionRect.height);
+
+                    // Get the name of the layer
+                    string layerName = LayerMask.LayerToName(go.layer);
+
+                    //--------- LAYER NAME COLOR OVERRIDES FOR VRCHAT'S LAYERS ----------
+                    if (layerName == "Interactive")
+                    {
+                        Color interactiveCol = new Color(0.5f, 0.7f, 0.8f);
+                        interactiveCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = interactiveCol;
+                        style.hover.textColor = interactiveCol;
+                    }
+                    else if (layerName == "Player")
+                    {
+                        Color playerCol = new Color (0f, 0.5f, 1f);
+                        playerCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = playerCol;
+                        style.hover.textColor = playerCol;
+                    }
+                    else if (layerName == "PlayerLocal")
+                    {
+                        Color playerLocalCol = new Color(1f, 0f, 0.1f);
+                        playerLocalCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = playerLocalCol;
+                        style.hover.textColor = playerLocalCol;
+                    }
+                    else if (layerName == "Environment")
+                    {
+                        Color environmentCol = new Color(0.0f, 1f, 0.0f);
+                        environmentCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = environmentCol;
+                        style.hover.textColor = environmentCol;
+                    }
+                    else if (layerName == "UiMenu")
+                    {
+                        Color uiMenuCol = new Color(0f, 0.7f, 0.7f);
+                        uiMenuCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = uiMenuCol;
+                        style.hover.textColor = uiMenuCol;
+                    }
+                    else if (layerName == "Pickup")
+                    {
+                        Color pickupCol = new Color(1f, 0.45f, 0.0f);
+                        pickupCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = pickupCol;
+                        style.hover.textColor = pickupCol;
+                    }
+                    else if (layerName == "PickupNoEnvironment")
+                    {
+                        Color pickupNoEnvironmentCol = new Color(1f, 0.45f, 0.0f);
+                        pickupNoEnvironmentCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = pickupNoEnvironmentCol;
+                        style.hover.textColor = pickupNoEnvironmentCol;
+                    }
+                    else if (layerName == "StereoLeft" || layerName == "StereoRight")
+                    {
+                        Color stereoCol = new Color(0.85f, 0.0f, 1f);
+                        stereoCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = stereoCol;
+                        style.hover.textColor = stereoCol;
+                    }
+                    else if (layerName == "Walkthrough")
+                    {
+                        Color walkthroughCol = new Color(0.0f, 1f, 0.0f);
+                        walkthroughCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = walkthroughCol;
+                        style.hover.textColor = walkthroughCol;
+                    }
+                    else if (layerName == "MirrorReflection")
+                    {
+                        Color mirrorReflectionCol = new Color(0.0f, 1f, 1f);
+                        mirrorReflectionCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = mirrorReflectionCol;
+                        style.hover.textColor = mirrorReflectionCol;
+                    }
+                    else if (layerName == "reserved2" || layerName == "reserved3" || layerName == "reserved4")
+                    {
+                        Color reservedCol = new Color(1f, 0f, 0f);
+                        reservedCol.a = go.activeInHierarchy ? 1f : 0.5f;
+                        style.normal.textColor = reservedCol;
+                        style.hover.textColor = reservedCol;
+                    }
+                    //--------- END LAYER NAME COLOR OVERRIDES ----------
+
+                    // Draw the layer name using the new GUIStyle
+                    GUI.Label(layerTextRect, layerName, style);
+                }
+            }
         }
     }
 }
