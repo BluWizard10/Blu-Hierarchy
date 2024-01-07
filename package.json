@@ -1,12 +1,19 @@
 {
   "name": "net.bluwizard.hierarchy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "BluHierarchy",
-  "description": "Blu's personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators.",
   "unity": "2022.3",
+  "description": "Blu's personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators.",
+  "gitDependencies": {},
+  "vpmDependencies": {},
   "author": {
     "name": "BluWizard",
     "email": "17975114+BluWizard10@users.noreply.github.com",
     "url": "https://vpm.bluwizard.net"
-  }
+  },
+  "legacyFolders": {
+    "Assets\\QHierarchy": "8d450c50245a17640b4af8434a7fe2c8"
+  },
+  "legacyFiles": {},
+  "legacyPackages": []
 }
