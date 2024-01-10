@@ -193,6 +193,7 @@ namespace BluWizard.Hierarchy
         }
         private static void DrawTreeLines(Rect selectionRect, GameObject go)
         {
+            if (go.transform.parent == null) return;
             Handles.BeginGUI();
             Handles.color = EditorGUIUtility.isProSkin ? Color.white : Color.black;
 
@@ -201,15 +202,25 @@ namespace BluWizard.Hierarchy
 
             // Constants for layout - adjust these as needed for your specific hierarchy layout
             const float lineThickness = 2f; // Thickness of the lines
-            const float verticalLineMargin = 6f; // Margin from the icon to the vertical line
-            const float horizontalParentOffset = 14f; // Horizontal offset from the child to the parent's vertical line
+            const float horizontalParentOffset = 21f; // Horizontal offset from the child to the parent's vertical line
 
             // Vertical line position should be constant, just to the left of the GameObject icon
-            float verticalLineX = selectionRect.x - verticalLineMargin;
+            float verticalLineX = selectionRect.x - horizontalParentOffset;
+
+            //Vector3[] verticalLineDots = [new Vector3(verticalLineX, selectionRect.y), new Vector3(verticalLineX, selectionRect.yMax)];
 
             // Draw the vertical line for this GameObject
-            Handles.DrawAAPolyLine(lineThickness, new Vector3(verticalLineX, selectionRect.y),
-            new Vector3(verticalLineX, selectionRect.yMax));
+            Handles.DrawAAPolyLine(lineThickness, new Vector3(verticalLineX, selectionRect.y), new Vector3(verticalLineX, selectionRect.yMax));
+
+            for (int i = 1; i < depth; i++)
+            {
+                float horizontalDistance = selectionRect.x - (33 + lineThickness);
+                if (i > 1)
+                {
+                    horizontalDistance -= i * 10;
+                }
+                Handles.DrawAAPolyLine(lineThickness, new Vector3(horizontalDistance, selectionRect.y), new Vector3(horizontalDistance, selectionRect.yMax));
+            }
 
             // For child GameObjects, draw the horizontal line to connect to their parent's vertical line
             if (depth > 0 && go.transform.parent != null)
@@ -221,9 +232,16 @@ namespace BluWizard.Hierarchy
                 float horizontalLineY = selectionRect.y + (selectionRect.height / 2f);
 
                 // Draw the horizontal line from the parent's vertical line to this GameObject's vertical line
-                Handles.DrawAAPolyLine(lineThickness, new Vector3(parentVerticalLineX, horizontalLineY),
-                new Vector3(verticalLineX, horizontalLineY));
+                float horizontalLineStart = selectionRect.x - 4;
+                if (go.transform.childCount > 0)
+                {
+                    horizontalLineStart -= 8;
+                }
+
+                Handles.DrawAAPolyLine(lineThickness, new Vector3(verticalLineX, horizontalLineY),
+                new Vector3(horizontalLineStart, horizontalLineY));
             }
+
 
             Handles.EndGUI();
         }
