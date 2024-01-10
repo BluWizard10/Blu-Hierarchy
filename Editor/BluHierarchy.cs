@@ -31,12 +31,47 @@ namespace BluWizard.Hierarchy
             return icon;
         }
 
-        // Ensure this method is called to initialize your custom icons
-        // public static void InitializeIcons()
-        // {
-        //    Texture2D testIcon = Resources.Load<Texture2D>("Icons/Test-Icon");
-        //    SetCustomIcon(typeof(Camera), testIcon); // Replace MyComponent with your specific component class
-        //}
+
+        //--------- SETTINGS ----------
+        public class BluHierarchySettingsWindow : EditorWindow
+        {
+            [MenuItem("Tools/BluWizard LABS/BluHierarchy Settings")]
+            public static void ShowWindow()
+            {
+                GetWindow<BluHierarchySettingsWindow>("BluHierarchy Settings");
+            }
+
+            void OnGUI()
+            {
+                bool currentShowTransformIcon = BluHierarchySettings.ShowTransformIcon;
+                bool newShowTransformIcon = EditorGUILayout.Toggle("Show Transform Icon", currentShowTransformIcon);
+
+                if (newShowTransformIcon != currentShowTransformIcon)
+                {
+                    BluHierarchySettings.ShowTransformIcon = newShowTransformIcon;
+                    BluHierarchy.RepaintHierarchyWindow();
+                }
+            }
+        }
+
+        public static class BluHierarchySettings
+        {
+            private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
+
+            public static bool ShowTransformIcon
+            {
+                get => EditorPrefs.GetBool(ShowTransformIconKey, false);
+                set => EditorPrefs.SetBool(ShowTransformIconKey, value);
+            }
+        }
+
+        public static void RepaintHierarchyWindow()
+        {
+            // This will get all open hierarchy windows and repaint them
+            EditorApplication.RepaintHierarchyWindow();
+        }
+        //--------- END SETTINGS ----------
+
 
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
         {
@@ -70,7 +105,9 @@ namespace BluWizard.Hierarchy
 
             foreach (Component component in components)
             {
-                if (component == null || component is Transform) continue;
+                if (component == null) continue;
+
+                if (component is Transform && !BluHierarchySettings.ShowTransformIcon) continue;
 
                 Texture2D icon = GetCustomIcon(component.GetType());
 
@@ -172,7 +209,7 @@ namespace BluWizard.Hierarchy
                 };
 
                 string textToShow = "EditorOnly";
-                
+
                 // Calculate the width of the GameObject's name using the style
                 GUIContent content = new GUIContent(go.name);
                 float nameWidth = style.CalcSize(content).x;

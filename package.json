@@ -1,6 +1,6 @@
 {
   "name": "net.bluwizard.hierarchy",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "BluHierarchy",
   "unity": "2022.3",
   "description": "Blu's personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators.",
