@@ -194,6 +194,7 @@ namespace BluWizard.Hierarchy
         private static void DrawTreeLines(Rect selectionRect, GameObject go)
         {
             if (go.transform.parent == null) return;
+            
             Handles.BeginGUI();
             Handles.color = EditorGUIUtility.isProSkin ? Color.white : Color.black;
 
@@ -207,7 +208,6 @@ namespace BluWizard.Hierarchy
             // Vertical line position should be constant, just to the left of the GameObject icon
             float verticalLineX = selectionRect.x - horizontalParentOffset;
 
-            //Vector3[] verticalLineDots = [new Vector3(verticalLineX, selectionRect.y), new Vector3(verticalLineX, selectionRect.yMax)];
 
             // Draw the vertical line for this GameObject
             Handles.DrawAAPolyLine(lineThickness, new Vector3(verticalLineX, selectionRect.y), new Vector3(verticalLineX, selectionRect.yMax));
@@ -219,19 +219,15 @@ namespace BluWizard.Hierarchy
                 {
                     horizontalDistance -= i * 10;
                 }
-                Handles.DrawAAPolyLine(lineThickness, new Vector3(horizontalDistance, selectionRect.y), new Vector3(horizontalDistance, selectionRect.yMax));
+                float lineX = selectionRect.x - (horizontalParentOffset + i * (horizontalParentOffset - 7));
+                Handles.DrawAAPolyLine(lineThickness, new Vector3(lineX, selectionRect.y), new Vector3(lineX, selectionRect.yMax));
             }
 
             // For child GameObjects, draw the horizontal line to connect to their parent's vertical line
             if (depth > 0 && go.transform.parent != null)
             {
-                // Calculate the X position for the horizontal line to start at the parent's vertical line
-                float parentVerticalLineX = selectionRect.x - (horizontalParentOffset * depth);
-
                 // The Y position for the horizontal line is the vertical center of the GameObject's rect
                 float horizontalLineY = selectionRect.y + (selectionRect.height / 2f);
-
-                // Draw the horizontal line from the parent's vertical line to this GameObject's vertical line
                 float horizontalLineStart = selectionRect.x - 4;
                 if (go.transform.childCount > 0)
                 {
