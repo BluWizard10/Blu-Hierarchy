@@ -45,6 +45,9 @@ namespace BluWizard.Hierarchy
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
             if (go == null) return;
 
+            // Draw the tree lines for this GameObject
+            DrawTreeLines(selectionRect, go);
+
             //--------- GAME OBJECT TOGGLE ----------
 
             Rect toggleRect = new Rect(selectionRect);
@@ -172,7 +175,7 @@ namespace BluWizard.Hierarchy
                 };
 
                 string textToShow = "EditorOnly";
-                
+
                 // Calculate the width of the GameObject's name using the style
                 GUIContent content = new GUIContent(go.name);
                 float nameWidth = style.CalcSize(content).x;
@@ -187,6 +190,54 @@ namespace BluWizard.Hierarchy
                 GUI.Label(tagTextRect, textToShow, style);
             }
 
+        }
+        private static void DrawTreeLines(Rect selectionRect, GameObject go)
+        {
+            Handles.BeginGUI();
+            Handles.color = EditorGUIUtility.isProSkin ? Color.white : Color.black;
+
+            // Calculate the depth of the GameObject in the hierarchy
+            int depth = GetIndentLevel(go);
+
+            // Constants for layout - adjust these as needed for your specific hierarchy layout
+            const float lineThickness = 2f; // Thickness of the lines
+            const float verticalLineMargin = 6f; // Margin from the icon to the vertical line
+            const float horizontalParentOffset = 14f; // Horizontal offset from the child to the parent's vertical line
+
+            // Vertical line position should be constant, just to the left of the GameObject icon
+            float verticalLineX = selectionRect.x - verticalLineMargin;
+
+            // Draw the vertical line for this GameObject
+            Handles.DrawAAPolyLine(lineThickness, new Vector3(verticalLineX, selectionRect.y),
+            new Vector3(verticalLineX, selectionRect.yMax));
+
+            // For child GameObjects, draw the horizontal line to connect to their parent's vertical line
+            if (depth > 0 && go.transform.parent != null)
+            {
+                // Calculate the X position for the horizontal line to start at the parent's vertical line
+                float parentVerticalLineX = selectionRect.x - (horizontalParentOffset * depth);
+
+                // The Y position for the horizontal line is the vertical center of the GameObject's rect
+                float horizontalLineY = selectionRect.y + (selectionRect.height / 2f);
+
+                // Draw the horizontal line from the parent's vertical line to this GameObject's vertical line
+                Handles.DrawAAPolyLine(lineThickness, new Vector3(parentVerticalLineX, horizontalLineY),
+                new Vector3(verticalLineX, horizontalLineY));
+            }
+
+            Handles.EndGUI();
+        }
+
+        private static int GetIndentLevel(GameObject go)
+        {
+            int level = 0;
+            Transform parent = go.transform.parent;
+            while (parent != null)
+            {
+                level++;
+                parent = parent.parent;
+            }
+            return level;
         }
     }
 }
