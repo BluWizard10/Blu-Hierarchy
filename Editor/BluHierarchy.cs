@@ -4,9 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Reflection;
-#if VRC_SDK_VRCSDK3
 using VRC.SDK3.Dynamics.PhysBone.Components;
-#endif
 
 namespace BluWizard.Hierarchy
 {
@@ -119,7 +117,7 @@ namespace BluWizard.Hierarchy
                 if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor"); }
                 else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>("Icons/vrcPipelineManager"); }
                 else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>("Icons/vrcPhysBone"); }
-                #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project.
+                #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project, as it switches the Icon depending on type of Phys Bone Collider selected.
                 else if (component.GetType().Name == "VRCPhysBoneCollider")
                 {
                     var physBoneCollider = component as VRCPhysBoneCollider;
@@ -147,13 +145,24 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCPickup") { icon = Resources.Load<Texture2D>("Icons/vrcPickup"); }
                 else if (component.GetType().Name == "VRCMirrorReflection") { icon = Resources.Load<Texture2D>("Icons/vrcMirrorReflection"); }
                 else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>("Icons/vrcStation"); }
-                // else if (component.GetType().Name == "VRCObjectSync") { icon = Resources.Load<Texture2D>("Icons/vrcObjectSync"); }
-                // else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
-                // else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
-                // else if (component.GetType().Name == "VRCAvatarPedestal") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal"); }
+                else if (component.GetType().Name == "VRCObjectSync") { icon = Resources.Load<Texture2D>("Icons/vrcObjectSync"); }
+                else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
+                else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
+                else if (component.GetType().Name == "VRCAvatarPedestal") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal"); }
 
                 // Load Custom Icons for Third-Party Utility Components
                 else if (component.GetType().Name == "VRCFury") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
+
+                else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryDirectLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakerySkyLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryLightmapGroupSelector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryLightmappedPrefab") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryPackAsSingleSquare") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakerySector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
 
                 // if no match, use Unity's Default Icons
                 else
