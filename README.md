@@ -6,6 +6,8 @@ This system is a Work In Progress and may change at any time!
 
 ![Demo Image](/Resources/Images/Unity_fR1bfK6l8k.png)
 
+# [📦 Add BluHierarchy to Creator Companion](https://vpm.bluwizard.net/)
+
 ## Features:
 - Component Icons. Click an Icon to toggle it's Active State On or Off.
 - GameObject ActiveState Toggle Button. Click to toggle the GameObject On or Off.
