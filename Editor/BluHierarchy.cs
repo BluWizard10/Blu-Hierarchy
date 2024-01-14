@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Reflection;
+#if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project.
 using VRC.SDK3.Dynamics.PhysBone.Components;
+#endif
 
 namespace BluWizard.Hierarchy
 {
@@ -149,6 +151,13 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
                 else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
                 else if (component.GetType().Name == "VRCAvatarPedestal") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal"); }
+                else if (component.GetType().Name == "VRCAVProVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoPlayer"); }
+                else if (component.GetType().Name == "VRCAVProVideoScreen") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoScreen"); }
+                else if (component.GetType().Name == "VRCAVProVideoSpeaker") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoSpeaker"); }
+                else if (component.GetType().Name == "VRCSpatialAudioSource") { icon = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource"); }
+                else if (component.GetType().Name == "VRCUiShape") { icon = Resources.Load<Texture2D>("Icons/vrcUiShape"); }
+                else if (component.GetType().Name == "VRCUnityVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcUnityVideoPlayer"); }
+                else if (component.GetType().Name == "VRCUrlInputField") { icon = Resources.Load<Texture2D>("Icons/vrcURLInputField"); }
 
                 // Load Custom Icons for Third-Party Utility Components
                 else if (component.GetType().Name == "VRCFury") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
@@ -164,7 +173,7 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
 
-                // if no match, use Unity's Default Icons
+                // if no match, use Unity's Default Icons for everything else
                 else
                 {
                     icon = GetCustomIcon(component.GetType());

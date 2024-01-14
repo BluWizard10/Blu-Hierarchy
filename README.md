@@ -1,6 +1,6 @@
-# Blu Hierarchy
+# BluHierarchy
 
-My own personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators. Contains a feature that allows toggling a GameObject or Component directly from the Hierarchy.
+My own personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators. Contains a feature that allows toggling a GameObject or Component directly from the Hierarchy, as well as customized Icons representing common VRC SDK Components in the Hierarchy.
 
 This system is a Work In Progress and may change at any time!
 
