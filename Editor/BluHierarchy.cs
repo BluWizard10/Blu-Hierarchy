@@ -139,7 +139,7 @@ namespace BluWizard.Hierarchy
                 #endif
                 else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>("Icons/vrcContactReceiver"); }
                 else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
-                else if (component.GetType().Name == "VRCImposterSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImposterSettings"); }
+                else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
 
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor"); }
