@@ -1,3 +1,8 @@
+# v0.3.0
+- Changed some Icons, again. Created a consistent look.
+- Added more new Icons.
+- Fixed missing #if statements.
+
 # v0.2.2
 - Changed some Icons for better visibility in the Hierarchy.
 - Added new Icons for common Components such as Bakery
