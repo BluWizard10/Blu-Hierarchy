@@ -1,3 +1,8 @@
+# v0.4.0
+- Added Icons for VRChat-specific Layers that is appended next to the Component Icons. It is Off by default.
+    - Enable this feature by Toggling On `Show Layer Icon` under `Tools -> BluWizard LABS -> BluHierarchy Settings` in Unity.
+    - *Icon will only show if the GameObject is on a specific Layer other than the Default Layer.*
+
 # v0.3.0
 - Changed some Icons, again. Created a consistent look.
 - Added more new Icons.

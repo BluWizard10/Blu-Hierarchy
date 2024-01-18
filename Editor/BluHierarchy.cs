@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Reflection;
+using System;
+
 #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project.
 using VRC.SDK3.Dynamics.PhysBone.Components;
 #endif
@@ -18,11 +20,35 @@ namespace BluWizard.Hierarchy
         {
             // Subscribe to the Editor's hierarchy window item callback
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
+            LoadLayerIcons();
         }
 
         // Inside your BluHierarchy.cs now includes a simple version of IconSystem
         private static Dictionary<string, Texture2D> loadedIcons = new Dictionary<string, Texture2D>();
+        private static Dictionary<string, Texture2D> layerIcons = new Dictionary<string, Texture2D>();
         private static Dictionary<System.Type, Texture2D> customComponentIcons = new Dictionary<System.Type, Texture2D>();
+
+        public static void LoadLayerIcons()
+        {
+            layerIcons.Add("TransparentFX", Resources.Load<Texture2D>("Icons/L_TransparentFX"));
+            layerIcons.Add("Ignore Raycast", Resources.Load<Texture2D>("Icons/L_IgnoreRaycast"));
+            layerIcons.Add("Water", Resources.Load<Texture2D>("Icons/L_Water"));
+            layerIcons.Add("UI", Resources.Load<Texture2D>("Icons/L_UI"));
+            layerIcons.Add("Interactive", Resources.Load<Texture2D>("Icons/L_Interactive"));
+            layerIcons.Add("Player", Resources.Load<Texture2D>("Icons/L_Player"));
+            layerIcons.Add("PlayerLocal", Resources.Load<Texture2D>("Icons/L_PlayerLocal"));
+            layerIcons.Add("Environment", Resources.Load<Texture2D>("Icons/L_Environment"));
+            layerIcons.Add("UiMenu", Resources.Load<Texture2D>("Icons/L_UiMenu"));
+            layerIcons.Add("Pickup", Resources.Load<Texture2D>("Icons/L_Pickup"));
+            layerIcons.Add("PickupNoEnvironment", Resources.Load<Texture2D>("Icons/L_Pickup"));
+            layerIcons.Add("StereoLeft", Resources.Load<Texture2D>("Icons/L_Stereo"));
+            layerIcons.Add("StereoRight", Resources.Load<Texture2D>("Icons/L_Stereo"));
+            layerIcons.Add("Walkthrough", Resources.Load<Texture2D>("Icons/L_Walkthrough"));
+            layerIcons.Add("MirrorReflection", Resources.Load<Texture2D>("Icons/L_MirrorReflection"));
+            layerIcons.Add("reserved2", Resources.Load<Texture2D>("Icons/L_Reserved"));
+            layerIcons.Add("reserved3", Resources.Load<Texture2D>("Icons/L_Reserved"));
+            layerIcons.Add("reserved4", Resources.Load<Texture2D>("Icons/L_Reserved"));
+        }
 
         public static void SetCustomIcon(System.Type componentType, Texture2D icon)
         {
@@ -49,10 +75,18 @@ namespace BluWizard.Hierarchy
             {
                 bool currentShowTransformIcon = BluHierarchySettings.ShowTransformIcon;
                 bool newShowTransformIcon = EditorGUILayout.Toggle("Show Transform Icon", currentShowTransformIcon);
+                bool currentShowLayerIcon = BluHierarchySettings.ShowLayerIcon;
 
                 if (newShowTransformIcon != currentShowTransformIcon)
                 {
                     BluHierarchySettings.ShowTransformIcon = newShowTransformIcon;
+                    RepaintHierarchyWindow();
+                }
+
+                BluHierarchySettings.ShowLayerIcon = EditorGUILayout.Toggle("Show Layer Icon", BluHierarchySettings.ShowLayerIcon);
+                if (BluHierarchySettings.ShowLayerIcon != currentShowLayerIcon)
+                {
+                    EditorPrefs.SetBool("BluHierarchy_ShowLayerIcon", BluHierarchySettings.ShowLayerIcon);
                     RepaintHierarchyWindow();
                 }
             }
@@ -61,11 +95,18 @@ namespace BluWizard.Hierarchy
         public static class BluHierarchySettings
         {
             private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
+            private const string ShowLayerIconKey = "BluHierarchy_ShowLayerIcon";
 
             public static bool ShowTransformIcon
             {
                 get => EditorPrefs.GetBool(ShowTransformIconKey, false);
                 set => EditorPrefs.SetBool(ShowTransformIconKey, value);
+            }
+
+            public static bool ShowLayerIcon
+            {
+                get => EditorPrefs.GetBool(ShowLayerIconKey, false);
+                set => EditorPrefs.SetBool(ShowLayerIconKey, value);
             }
         }
 
@@ -98,11 +139,51 @@ namespace BluWizard.Hierarchy
                 EditorUtility.SetDirty(go);
             }
 
-            //--------- COMPONENT ICONS PROCESS ----------
+
+            //--------- ICONS ---------
 
             // Start drawing component icons to the left of the toggle button
             float iconSize = 16;
             float currentX = selectionRect.xMax - iconSize - 22;
+
+
+            //--------- LAYER ICON PROCESS ---------
+
+            float separatorWidth = 1;
+            float separatorHeight = selectionRect.height;
+            float separatorX = selectionRect.xMax - iconSize - 24 - separatorWidth;
+            float separatorY = selectionRect.y;
+
+            if (BluHierarchySettings.ShowLayerIcon)
+            {
+                string layerName = LayerMask.LayerToName(go.layer);
+
+                if (layerIcons.ContainsKey(layerName))
+                {
+                    Texture2D layerIcon = layerIcons[layerName];
+                    if (layerIcon != null)
+                    {
+                        Rect layerIconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
+                        GUI.DrawTexture(layerIconRect, layerIcon);
+                    }
+
+                    currentX -= iconSize + 2;
+
+                    Rect separatorRect = new Rect(separatorX, separatorY, separatorWidth, separatorHeight);
+                    Texture2D separatorTexture = new Texture2D(1, 1);
+                    separatorTexture.SetPixel(0, 0, Color.gray);
+                    separatorTexture.Apply();
+
+                    GUI.DrawTexture(separatorRect, separatorTexture);
+
+                    currentX -= separatorWidth + 2;
+                }
+            }
+
+            //--------- SEPARATOR LINE ---------
+
+
+            //--------- COMPONENT ICONS PROCESS ----------
 
             // Get all components on the GameObject
             Component[] components = go.GetComponents<Component>();
@@ -119,7 +200,7 @@ namespace BluWizard.Hierarchy
                 if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor"); }
                 else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>("Icons/vrcPipelineManager"); }
                 else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>("Icons/vrcPhysBone"); }
-                #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project, as it switches the Icon depending on type of Phys Bone Collider selected.
+#if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project, as it switches the Icon depending on type of Phys Bone Collider selected.
                 else if (component.GetType().Name == "VRCPhysBoneCollider")
                 {
                     var physBoneCollider = component as VRCPhysBoneCollider;
@@ -136,7 +217,7 @@ namespace BluWizard.Hierarchy
                             break;
                     }
                 }
-                #endif
+#endif
                 else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>("Icons/vrcContactReceiver"); }
                 else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
                 else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
