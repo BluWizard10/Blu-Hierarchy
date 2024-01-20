@@ -15,12 +15,24 @@ namespace BluWizard.Hierarchy
     [InitializeOnLoad]
     public static class BluHierarchy
     {
-
+        private static bool iconsLoaded = false;
         static BluHierarchy()
         {
             // Subscribe to the Editor's hierarchy window item callback
+            EditorApplication.update += OnEditorUpdate;
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
-            LoadLayerIcons();
+        }
+
+        private static void OnEditorUpdate()
+        {
+            if (!iconsLoaded)
+            {
+                LoadLayerIcons();
+                iconsLoaded = true;
+
+                // Remove the update callback to prevent it from running repeatedly
+                EditorApplication.update -= OnEditorUpdate;
+            }
         }
 
         // Inside your BluHierarchy.cs now includes a simple version of IconSystem
