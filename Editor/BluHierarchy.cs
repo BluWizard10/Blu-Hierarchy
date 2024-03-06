@@ -42,6 +42,12 @@ namespace BluWizard.Hierarchy
 
         public static void LoadLayerIcons()
         {
+            // Check if Unity is in Play Mode
+            if (EditorApplication.isPlaying)
+            {
+                // Exit the method to optimize performance
+                return;
+            }
             layerIcons.Add("TransparentFX", Resources.Load<Texture2D>("Icons/L_TransparentFX"));
             layerIcons.Add("Ignore Raycast", Resources.Load<Texture2D>("Icons/L_IgnoreRaycast"));
             layerIcons.Add("Water", Resources.Load<Texture2D>("Icons/L_Water"));
@@ -132,6 +138,12 @@ namespace BluWizard.Hierarchy
 
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
         {
+            // Check if Unity is in Play Mode
+            if (EditorApplication.isPlaying)
+            {
+                // Exit the method during Play Mode to optimize performance.
+                return;
+            }
 
             // Convert the instance ID to a GameObject
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;

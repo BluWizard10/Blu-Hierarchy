@@ -1,3 +1,6 @@
+# v0.4.2
+- Added isPlaying check to prevent icons and GUI changes from loading while in Play Mode. This should optimize performance.
+
 # v0.4.1
 - Fixed a bug where the Layer Icons would never load when Unity is relaunched. It is refreshing the Icons with the most dirtiest method I could think of.
 
