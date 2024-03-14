@@ -1,3 +1,8 @@
+# v0.5.0
+- Slightly widened all custom Component Icons for display clarity.
+- Changed Udon Behaviour Component icon to something that I think looked better when representing either an Udon Graph or an UdonSharp Component.
+- Added icon for the `VRCHeadChop` Component introduced in SDK 3.5.2.
+
 # v0.4.2
 - Added isPlaying check to prevent icons and GUI changes from loading while in Play Mode. This should optimize performance.
 

@@ -138,13 +138,6 @@ namespace BluWizard.Hierarchy
 
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
         {
-            // Check if Unity is in Play Mode
-            if (EditorApplication.isPlaying)
-            {
-                // Exit the method during Play Mode to optimize performance.
-                return;
-            }
-
             // Convert the instance ID to a GameObject
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
             if (go == null) return;
@@ -180,6 +173,13 @@ namespace BluWizard.Hierarchy
 
             if (BluHierarchySettings.ShowLayerIcon)
             {
+                // Check if Unity is in Play Mode
+                if (EditorApplication.isPlaying)
+                {
+                    // Exit the method during Play Mode to optimize performance.
+                    return;
+                }
+
                 string layerName = LayerMask.LayerToName(go.layer);
 
                 if (layerIcons.ContainsKey(layerName))
@@ -214,6 +214,13 @@ namespace BluWizard.Hierarchy
 
             foreach (Component component in components)
             {
+                // Check if Unity is in Play Mode
+                if (EditorApplication.isPlaying)
+                {
+                    // Exit the method during Play Mode to optimize performance.
+                    return;
+                }
+
                 if (component == null) continue;
 
                 if (component is Transform && !BluHierarchySettings.ShowTransformIcon) continue;
@@ -245,6 +252,7 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>("Icons/vrcContactReceiver"); }
                 else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
                 else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
+                else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>("Icons/vrcHeadChop"); }
 
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor"); }
