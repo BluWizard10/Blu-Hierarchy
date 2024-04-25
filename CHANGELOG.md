@@ -1,3 +1,6 @@
+# v0.6.0
+- Added the `GameObject -> Copy Path` option to test the usage of copying the Hierarchy path of a GameObject to the clipboard.
+
 # v0.5.0
 - Slightly widened all custom Component Icons for display clarity.
 - Changed Udon Behaviour Component icon to something that I think looked better when representing either an Udon Graph or an UdonSharp Component.
