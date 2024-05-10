@@ -1,3 +1,6 @@
+# v0.6.1
+- Added Icons for the new Unity Layers exposed by the latest VRChat SDK.
+
 # v0.6.0
 - Added the `GameObject -> Copy Path` option to test the usage of copying the Hierarchy path of a GameObject to the clipboard.
 

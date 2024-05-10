@@ -50,8 +50,11 @@ namespace BluWizard.Hierarchy
             }
             layerIcons.Add("TransparentFX", Resources.Load<Texture2D>("Icons/L_TransparentFX"));
             layerIcons.Add("Ignore Raycast", Resources.Load<Texture2D>("Icons/L_IgnoreRaycast"));
+            layerIcons.Add("reserved3", Resources.Load<Texture2D>("Icons/L_Reserved"));
             layerIcons.Add("Water", Resources.Load<Texture2D>("Icons/L_Water"));
             layerIcons.Add("UI", Resources.Load<Texture2D>("Icons/L_UI"));
+            layerIcons.Add("reserved6", Resources.Load<Texture2D>("Icons/L_Reserved"));
+            layerIcons.Add("reserved7", Resources.Load<Texture2D>("Icons/L_Reserved"));
             layerIcons.Add("Interactive", Resources.Load<Texture2D>("Icons/L_Interactive"));
             layerIcons.Add("Player", Resources.Load<Texture2D>("Icons/L_Player"));
             layerIcons.Add("PlayerLocal", Resources.Load<Texture2D>("Icons/L_PlayerLocal"));
@@ -63,8 +66,9 @@ namespace BluWizard.Hierarchy
             layerIcons.Add("StereoRight", Resources.Load<Texture2D>("Icons/L_Stereo"));
             layerIcons.Add("Walkthrough", Resources.Load<Texture2D>("Icons/L_Walkthrough"));
             layerIcons.Add("MirrorReflection", Resources.Load<Texture2D>("Icons/L_MirrorReflection"));
+            layerIcons.Add("InternalUI", Resources.Load<Texture2D>("Icons/L_InternalUI"));
+            layerIcons.Add("HardwareObjects", Resources.Load<Texture2D>("Icons/L_HardwareObjects"));
             layerIcons.Add("reserved2", Resources.Load<Texture2D>("Icons/L_Reserved"));
-            layerIcons.Add("reserved3", Resources.Load<Texture2D>("Icons/L_Reserved"));
             layerIcons.Add("reserved4", Resources.Load<Texture2D>("Icons/L_Reserved"));
         }
 
