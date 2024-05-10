@@ -1,0 +1,21 @@
+name: Trigger Repo Listing Generator
+
+on:
+  release:
+    types: [published, unpublished, created, edited, deleted]
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.VPM_REPO_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'bluwizard10',
+              repo: 'VPM',
+              workflow_id: 'build-listing.yml',
+              ref: 'main',
+            })
