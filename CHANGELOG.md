@@ -1,3 +1,6 @@
+# v0.7.0
+- Added Icons for the new VRC Constraint Components.
+
 # v0.6.1
 - Added Icons for the new Unity Layers exposed by the latest VRChat SDK.
 

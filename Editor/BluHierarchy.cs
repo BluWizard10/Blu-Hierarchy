@@ -288,6 +288,12 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
                 else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
                 else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>("Icons/vrcHeadChop"); }
+                else if (component.GetType().Name == "VRCParentConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcParentConstraint"); }
+                else if (component.GetType().Name == "VRCPositionConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcPositionConstraint"); }
+                else if (component.GetType().Name == "VRCRotationConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcRotationConstraint"); }
+                else if (component.GetType().Name == "VRCScaleConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcScaleConstraint"); }
+                else if (component.GetType().Name == "VRCAimConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcAimConstraint"); }
+                else if (component.GetType().Name == "VRCLookAtConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcLookAtConstraint"); }
 
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor"); }
