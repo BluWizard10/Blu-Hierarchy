@@ -1,5 +1,5 @@
 # v1.0.0
-- Now going 1.0!
+- Now going 1.0! Package was also renamed to coincide with the other Packages.
 - Re-designed icons for VRC Constraint Components for visual clarity and to better differentiate between Unity vs VRC Constraints. The other ones were kind of messy to begin with...
 
 # v0.7.0
