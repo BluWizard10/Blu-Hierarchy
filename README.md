@@ -1,4 +1,4 @@
-# BluHierarchy
+# BluWizard Hierarchy System
 
 My own personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators. Contains a feature that allows toggling a GameObject or Component directly from the Hierarchy, as well as customized Icons representing common VRC SDK Components in the Hierarchy.
 
@@ -11,7 +11,7 @@ This system is a Work In Progress and may change at any time!
 ## Features:
 - Component Icons. Click an Icon to toggle it's Active State On or Off.
 - GameObject ActiveState Toggle Button. Click to toggle the GameObject On or Off.
-- Custom Icons representing known Components from the VRChat SDK, such as Avatar Dynamics and Udon Behaviours.
+- Custom Icons representing known Components from the VRChat SDK, such as Avatar Dynamics, Udon Behaviours, and VRC Constraints!
 - Custom Icons for known third-party Components such as Bakery and VRCFury.
 
 ## Benefits:
