@@ -87,7 +87,7 @@ namespace BluWizard.Hierarchy
         //--------- SETTINGS ----------
         public class BluHierarchySettingsWindow : EditorWindow
         {
-            [MenuItem("Tools/BluWizard LABS/BluHierarchy Settings")]
+            [MenuItem("BluWizard LABS/BluHierarchy Settings")]
             public static void ShowWindow()
             {
                 GetWindow<BluHierarchySettingsWindow>("BluHierarchy Settings");

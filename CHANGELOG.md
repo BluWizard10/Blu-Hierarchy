@@ -1,3 +1,6 @@
+# v1.0.1
+- Changed Menu Settings location to it's own dedicated area in the Unity Menu Bar, instead of inside `Tools`.
+
 # v1.0.0
 - Now going 1.0! Package was also renamed to coincide with the other Packages.
 - Re-designed icons for VRC Constraint Components for visual clarity and to better differentiate between Unity vs VRC Constraints. The other ones were kind of messy to begin with...
