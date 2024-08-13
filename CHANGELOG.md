@@ -1,3 +1,7 @@
+# v1.1.0
+- Redesigned ALL icons for better clarity on the Hierarchy. The edgy file-like icons were getting a bit old...
+- Added icon for d4rkAvatarOptimizer.
+
 # v1.0.1
 - Changed Menu Settings location to it's own dedicated area in the Unity Menu Bar, instead of inside `Tools`.
 

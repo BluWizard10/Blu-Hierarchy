@@ -287,6 +287,7 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>("Icons/vrcContactReceiver"); }
                 else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
                 else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
+                else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
                 else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>("Icons/vrcHeadChop"); }
                 else if (component.GetType().Name == "VRCParentConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcParentConstraint"); }
                 else if (component.GetType().Name == "VRCPositionConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcPositionConstraint"); }
@@ -332,6 +333,8 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "BakerySector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+
+                else if (component.GetType().Name == "d4rkAvatarOptimizer") { icon = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer"); }
 
                 // if no match, use Unity's Default Icons for everything else
                 else
