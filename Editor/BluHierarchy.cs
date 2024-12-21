@@ -98,6 +98,8 @@ namespace BluWizard.Hierarchy
                 bool currentShowTransformIcon = BluHierarchySettings.ShowTransformIcon;
                 bool newShowTransformIcon = EditorGUILayout.Toggle("Show Transform Icon", currentShowTransformIcon);
                 bool currentShowLayerIcon = BluHierarchySettings.ShowLayerIcon;
+                bool currentShowHiddenComponents = BluHierarchySettings.ShowHiddenComponents;
+                bool newShowHiddenComponents = EditorGUILayout.Toggle("Show Hidden Components", currentShowHiddenComponents);
 
                 if (newShowTransformIcon != currentShowTransformIcon)
                 {
@@ -109,6 +111,12 @@ namespace BluWizard.Hierarchy
                 if (BluHierarchySettings.ShowLayerIcon != currentShowLayerIcon)
                 {
                     EditorPrefs.SetBool("BluHierarchy_ShowLayerIcon", BluHierarchySettings.ShowLayerIcon);
+                    RepaintHierarchyWindow();
+                }
+                
+                if (newShowHiddenComponents != currentShowHiddenComponents)
+                {
+                    BluHierarchySettings.ShowHiddenComponents = newShowHiddenComponents;
                     RepaintHierarchyWindow();
                 }
             }
@@ -149,6 +157,7 @@ namespace BluWizard.Hierarchy
         {
             private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
             private const string ShowLayerIconKey = "BluHierarchy_ShowLayerIcon";
+            private const string ShowHiddenComponentsKey = "BluHierarchy_ShowHiddenComponents";
 
             public static bool ShowTransformIcon
             {
@@ -160,6 +169,12 @@ namespace BluWizard.Hierarchy
             {
                 get => EditorPrefs.GetBool(ShowLayerIconKey, false);
                 set => EditorPrefs.SetBool(ShowLayerIconKey, value);
+            }
+            
+            public static bool ShowHiddenComponents
+            {
+                get => EditorPrefs.GetBool(ShowHiddenComponentsKey, false);
+                set => EditorPrefs.SetBool(ShowHiddenComponentsKey, value);
             }
         }
 
@@ -257,6 +272,8 @@ namespace BluWizard.Hierarchy
                 }
 
                 if (component == null) continue;
+
+                if (!BluHierarchySettings.ShowHiddenComponents && (component.hideFlags & HideFlags.HideInInspector) != 0) continue;
 
                 if (component is Transform && !BluHierarchySettings.ShowTransformIcon) continue;
 

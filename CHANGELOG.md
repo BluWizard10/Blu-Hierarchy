@@ -1,3 +1,7 @@
+# v1.2.0
+- Components that have the `HideFlags.HideInInspector` argument in the Script will now be hidden by default. This fixes a bug where those hidden Components were exposed in the Hierarchy when they were not supposed to.
+  - You can show them again in the Hierarchy by toggling "Show Hidden Components" in the BluHierarchy Settings, if for some weird reason you want to see them. ¯\_(ツ)_/¯
+
 # v1.1.0
 - Redesigned ALL icons for better clarity on the Hierarchy. The edgy file-like icons were getting a bit old...
 - Added icon for d4rkAvatarOptimizer.
