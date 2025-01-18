@@ -2,7 +2,7 @@
 
 My own personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators. Contains a feature that allows toggling a GameObject or Component directly from the Hierarchy, as well as customized Icons representing common VRC SDK Components in the Hierarchy.
 
-This system is a Work In Progress and may change at any time!
+Compared to other systems, this one is intended to match the Editor UI without being too distracting. Less is more, is how I would best put it.
 
 ![Demo Image](/Resources/Images/Unity_YskJ9RDDUZ.png)
 
