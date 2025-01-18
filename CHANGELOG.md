@@ -1,6 +1,10 @@
+# v1.4.0
+- Updated VRC Component Icons with neutral flat colors. This should make them slightly easier to see in both the Unity Light Theme and Dark Theme.
+- Changed the name of `BluHierarchy Settings` to `Enhanced Hierarchy Settings`. This is only a visual change. Everything else remains the same.
+
 # v1.2.0
 - Components that have the `HideFlags.HideInInspector` argument in the Script will now be hidden by default. This fixes a bug where those hidden Components were exposed in the Hierarchy when they were not supposed to.
-  - You can show them again in the Hierarchy by toggling "Show Hidden Components" in the BluHierarchy Settings, if for some weird reason you want to see them. ¯\_(ツ)_/¯
+  - You can show them again in the Hierarchy by toggling "Show Hidden Components" in the Enhanced Hierarchy Settings, if for some weird reason you want to see them.
 
 # v1.1.0
 - Redesigned ALL icons for better clarity on the Hierarchy. The edgy file-like icons were getting a bit old...
@@ -35,7 +39,7 @@
 
 # v0.4.0
 - Added Icons for VRChat-specific Layers that is appended next to the Component Icons. It is Off by default.
-    - Enable this feature by Toggling On `Show Layer Icon` under `Tools -> BluWizard LABS -> BluHierarchy Settings` in Unity.
+    - Enable this feature by Toggling On `Show Layer Icon` under `Tools -> BluWizard LABS -> Enhanced Hierarchy Settings` in Unity.
     - *Icon will only show if the GameObject is on a specific Layer other than the Default Layer.*
 
 # v0.3.0

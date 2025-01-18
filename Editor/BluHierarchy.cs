@@ -87,10 +87,10 @@ namespace BluWizard.Hierarchy
         //--------- SETTINGS ----------
         public class BluHierarchySettingsWindow : EditorWindow
         {
-            [MenuItem("BluWizard LABS/BluHierarchy Settings")]
+            [MenuItem("BluWizard LABS/Enhanced Hierarchy Settings")]
             public static void ShowWindow()
             {
-                GetWindow<BluHierarchySettingsWindow>("BluHierarchy Settings");
+                GetWindow<BluHierarchySettingsWindow>("Enhanced Hierarchy Settings");
             }
 
             void OnGUI()
@@ -340,15 +340,15 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
                 else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
 
-                else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                else if (component.GetType().Name == "BakeryDirectLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                else if (component.GetType().Name == "BakerySkyLight") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryPointLight"); }
+                else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryLightMesh"); }
+                else if (component.GetType().Name == "BakeryDirectLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
+                else if (component.GetType().Name == "BakerySkyLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
                 else if (component.GetType().Name == "BakeryLightmapGroupSelector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "BakeryLightmappedPrefab") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "BakeryPackAsSingleSquare") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
                 else if (component.GetType().Name == "BakerySector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryVolume"); }
                 else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
 
                 else if (component.GetType().Name == "d4rkAvatarOptimizer") { icon = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer"); }

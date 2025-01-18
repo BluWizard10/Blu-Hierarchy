@@ -4,7 +4,7 @@ My own personal editor enhancement system that introduces an improved Hierarchy 
 
 This system is a Work In Progress and may change at any time!
 
-![Demo Image](/Resources/Images/Unity_fR1bfK6l8k.png)
+![Demo Image](/Resources/Images/Unity_YskJ9RDDUZ.png)
 
 # [📦 Add Enhanced Hierarchy System to Creator Companion](https://vpm.bluwizard.net/)
 
