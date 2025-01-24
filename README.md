@@ -13,6 +13,7 @@ Compared to other systems, this one is intended to match the Editor UI without b
 - GameObject ActiveState Toggle Button. Click to toggle the GameObject On or Off.
 - Custom Icons representing known Components from the VRChat SDK, such as Avatar Dynamics, Udon Behaviours, and VRC Constraints!
 - Custom Icons for known third-party Components such as Bakery and VRCFury.
+- Alternate Icons with darker color tone if using the Light Theme.
 
 ## Benefits:
 - No DLLs, no BS!
