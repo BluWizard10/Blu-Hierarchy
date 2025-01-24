@@ -1,3 +1,6 @@
+# v1.5.1
+- Added new Icons for VRCFury SPS Components and Global Colliders.
+
 # v1.5.0
 - Added alternate Icons so that they are all easier to see in both the Unity Light and Dark Themes.
 - Script has been updated with `isDarkTheme` parameter to detect these changes.

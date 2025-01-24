@@ -337,11 +337,11 @@ namespace BluWizard.Hierarchy
                 // Load Custom Icons for Third-Party Utility Components
                 else if (component.GetType().Name == "VRCFury") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
                 else if (component.GetType().Name == "VRCFuryComponent") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                else if (component.GetType().Name == "VRCFuryGlobalCollider") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                else if (component.GetType().Name == "VRCFuryHapticPlug") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                else if (component.GetType().Name == "VRCFuryHapticSocket") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
+                else if (component.GetType().Name == "VRCFuryGlobalCollider") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryGlobalCollider" : "Icons/VRCFuryGlobalCollider_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticPlug") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFurySPSPlug" : "Icons/VRCFurySPSPlug_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticSocket") { icon = Resources.Load<Texture2D>("Icons/VRCFurySPSSocket"); }
+                else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticReceiver" : "Icons/VRCFuryHapticReceiver_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticSender" : "Icons/VRCFuryHapticSender_L"); }
 
                 else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryPointLight"); }
                 else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryLightMesh"); }
