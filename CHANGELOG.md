@@ -1,3 +1,7 @@
+# v1.5.0
+- Added alternate Icons so that they are all easier to see in both the Unity Light and Dark Themes.
+- Script has been updated with `isDarkTheme` parameter to detect these changes.
+
 # v1.4.0
 - Updated VRC Component Icons with neutral flat colors. This should make them slightly easier to see in both the Unity Light Theme and Dark Theme.
 - Changed the name of `BluHierarchy Settings` to `Enhanced Hierarchy Settings`. This is only a visual change. Everything else remains the same.

@@ -279,10 +279,13 @@ namespace BluWizard.Hierarchy
 
                 Texture2D icon = null;
 
+                // Check for Pro Theme
+                bool isDarkTheme = EditorGUIUtility.isProSkin;
+
                 // Load Custom Icons for VRC Avatar SDK Components
-                if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor"); }
-                else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>("Icons/vrcPipelineManager"); }
-                else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>("Icons/vrcPhysBone"); }
+                if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarDescriptor" : "Icons/vrcAvatarDescriptor_L"); }
+                else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPipelineManager" : "Icons/vrcPipelineManager_L"); }
+                else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBone" : "Icons/vrcPhysBone_L"); }
 #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project, as it switches the Icon depending on type of Phys Bone Collider selected.
                 else if (component.GetType().Name == "VRCPhysBoneCollider")
                 {
@@ -290,35 +293,35 @@ namespace BluWizard.Hierarchy
                     switch (physBoneCollider.shapeType)
                     {
                         case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Plane:
-                            icon = Resources.Load<Texture2D>("Icons/vrcPhysBoneColliderPlane");
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneColliderPlane" : "Icons/vrcPhysBoneColliderPlane_L");
                             break;
                         case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Sphere:
-                            icon = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider");
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
                             break;
                         case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Capsule:
-                            icon = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider");
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
                             break;
                     }
                 }
 #endif
-                else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>("Icons/vrcContactReceiver"); }
-                else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>("Icons/vrcContactSender"); }
-                else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
-                else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>("Icons/vrcImpostorSettings"); }
-                else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>("Icons/vrcHeadChop"); }
-                else if (component.GetType().Name == "VRCParentConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcParentConstraint"); }
-                else if (component.GetType().Name == "VRCPositionConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcPositionConstraint"); }
-                else if (component.GetType().Name == "VRCRotationConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcRotationConstraint"); }
-                else if (component.GetType().Name == "VRCScaleConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcScaleConstraint"); }
-                else if (component.GetType().Name == "VRCAimConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcAimConstraint"); }
-                else if (component.GetType().Name == "VRCLookAtConstraint") {icon = Resources.Load<Texture2D>("Icons/vrcLookAtConstraint"); }
+                else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactReceiver" : "Icons/vrcContactReceiver_L"); }
+                else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactSender" : "Icons/vrcContactSender_L"); }
+                else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
+                else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
+                else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L"); }
+                else if (component.GetType().Name == "VRCParentConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L"); }
+                else if (component.GetType().Name == "VRCPositionConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L"); }
+                else if (component.GetType().Name == "VRCRotationConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L"); }
+                else if (component.GetType().Name == "VRCScaleConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
+                else if (component.GetType().Name == "VRCAimConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
+                else if (component.GetType().Name == "VRCLookAtConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
 
                 // Load Custom Icons for VRC World SDK Components
-                else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor"); }
+                else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
                 else if (component.GetType().Name == "UdonBehaviour") { icon = Resources.Load<Texture2D>("Icons/vrcUdonBehaviour"); }
                 else if (component.GetType().Name == "VRCPickup") { icon = Resources.Load<Texture2D>("Icons/vrcPickup"); }
                 else if (component.GetType().Name == "VRCMirrorReflection") { icon = Resources.Load<Texture2D>("Icons/vrcMirrorReflection"); }
-                else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>("Icons/vrcStation"); }
+                else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcStation" : "Icons/vrcStation_L"); }
                 else if (component.GetType().Name == "VRCObjectSync") { icon = Resources.Load<Texture2D>("Icons/vrcObjectSync"); }
                 else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
                 else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
