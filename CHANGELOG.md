@@ -1,3 +1,7 @@
+# v1.5.2
+- Potential fix of a memory leak on Theme Change.
+- Updated more Icons.
+
 # v1.5.1
 - Added new Icons for VRCFury SPS Components and Global Colliders.
 
