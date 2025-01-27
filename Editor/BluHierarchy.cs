@@ -178,10 +178,15 @@ namespace BluWizard.Hierarchy
             }
         }
 
+        public static float nextRepaintTime;
         public static void RepaintHierarchyWindow()
         {
-            // This will get all open hierarchy windows and repaint them
-            EditorApplication.RepaintHierarchyWindow();
+           if (Time.realtimeSinceStartup < nextRepaintTime) return;
+
+           // Optimize draw calls on repaint - fixed CPU performance on theme change?
+           nextRepaintTime = Time.realtimeSinceStartup + 0.5f;
+           // This will get all open hierarchy windows and repaint them
+           EditorApplication.RepaintHierarchyWindow();
         }
         //--------- END SETTINGS ----------
 
