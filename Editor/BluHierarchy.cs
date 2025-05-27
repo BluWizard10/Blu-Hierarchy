@@ -326,6 +326,7 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCScaleConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
                 else if (component.GetType().Name == "VRCAimConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
                 else if (component.GetType().Name == "VRCLookAtConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
+                else if (component.GetType().Name == "VRCPerPlatformOverrides") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPerPlatformOverrides" : "Icons/vrcPerPlatformOverrides"); }
 
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
