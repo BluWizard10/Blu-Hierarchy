@@ -1,3 +1,6 @@
+# v1.6.0
+- Component Icons no longer overlap text in the Hierarchy! Any icons that overlap the GameObject's name will now be faded away.
+
 # v1.5.2
 - Potential fix of a memory leak on Theme Change.
 - Updated more Icons.

@@ -267,6 +267,12 @@ namespace BluWizard.Hierarchy
             // Get all components on the GameObject
             Component[] components = go.GetComponents<Component>();
 
+            // Calculate name width to prevent overlap
+            GUIStyle labelStyle = EditorStyles.label;
+            float nameWidth = labelStyle.CalcSize(new GUIContent(go.name)).x;
+            float minX = selectionRect.x + nameWidth + 8f; // Prevent drawing over the name + some spacing
+            float fadeThreshold = minX + 16f; // Start fading out slightly before the cutoff
+
             foreach (Component component in components)
             {
                 // Check if Unity is in Play Mode
@@ -314,12 +320,12 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
                 else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
                 else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L"); }
-                else if (component.GetType().Name == "VRCParentConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L"); }
-                else if (component.GetType().Name == "VRCPositionConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L"); }
-                else if (component.GetType().Name == "VRCRotationConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L"); }
-                else if (component.GetType().Name == "VRCScaleConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
-                else if (component.GetType().Name == "VRCAimConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
-                else if (component.GetType().Name == "VRCLookAtConstraint") {icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
+                else if (component.GetType().Name == "VRCParentConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L"); }
+                else if (component.GetType().Name == "VRCPositionConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L"); }
+                else if (component.GetType().Name == "VRCRotationConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L"); }
+                else if (component.GetType().Name == "VRCScaleConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
+                else if (component.GetType().Name == "VRCAimConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
+                else if (component.GetType().Name == "VRCLookAtConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
 
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
@@ -375,6 +381,14 @@ namespace BluWizard.Hierarchy
 
                 Rect iconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
 
+                // --- FADE OUT / SKIP ICON IF OVERLAPPING NAME ---
+                if (currentX < minX)
+                    break;
+
+                float alpha = 1f;
+                if (currentX < fadeThreshold)
+                    alpha = Mathf.InverseLerp(minX, fadeThreshold, currentX);
+
                 bool isEnabled = false;
                 bool canToggle = false;
 
@@ -388,6 +402,15 @@ namespace BluWizard.Hierarchy
                 {
                     isEnabled = rendererComponent.enabled;
                     canToggle = true;
+                }
+                else
+                {
+                    var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                    if (enabledProp != null && enabledProp.PropertyType == typeof(bool))
+                    {
+                        isEnabled = (bool)enabledProp.GetValue(component, null);
+                        canToggle = true;
+                    }
                 }
 
                 // Component Toggle functionality
@@ -417,7 +440,7 @@ namespace BluWizard.Hierarchy
 
                 // Set the color for the icon based on the enabled state and if it's toggleable
                 Color prevColor = GUI.color;
-                GUI.color = canToggle ? (isEnabled ? Color.white : new Color(1f, 1f, 1f, 0.5f)) : Color.white;
+                GUI.color = canToggle ? (isEnabled ? new Color(1f, 1f, 1f, alpha) : new Color(1f, 1f, 1f, 0.5f * alpha)) : new Color(1f, 1f, 1f, alpha);
 
                 // Draw the texture with the modified color
                 GUI.DrawTexture(iconRect, icon);
@@ -445,7 +468,7 @@ namespace BluWizard.Hierarchy
                 }
 
                 // Adjust currentX for the next icon
-                currentX -= iconSize + 2; // icon size plus some padding
+                currentX -= iconSize + 2; // Move to the next icon
 
             }
             // Draw EditorOnly Text
