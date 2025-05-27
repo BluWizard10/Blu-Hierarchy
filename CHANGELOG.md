@@ -1,3 +1,6 @@
+# v1.7.0
+- Added icon for VRCPerPlatformOverrides component.
+
 # v1.6.0
 - Component Icons no longer overlap text in the Hierarchy! Any icons that overlap the GameObject's name will now be faded away.
 
