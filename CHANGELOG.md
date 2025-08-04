@@ -1,3 +1,9 @@
+# v1.7.1
+- Added Layer Icon for `Item`, introduced in SDK 3.8.2.
+- Updated Settings Panel with Tooltips to explain what the setting will do.
+- Added setting that can Show/Hide the GameObject checkbox in the Hierarchy, because someone wanted that.
+- Changed location of Settings panel back to `Tools/BluWizard LABS/Enhanced Hierarchy Settings`
+
 # v1.7.0
 - Added icon for VRCPerPlatformOverrides component.
 

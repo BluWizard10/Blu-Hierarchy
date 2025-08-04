@@ -51,6 +51,7 @@ namespace BluWizard.Hierarchy
             layerIcons.Add("TransparentFX", Resources.Load<Texture2D>("Icons/L_TransparentFX"));
             layerIcons.Add("Ignore Raycast", Resources.Load<Texture2D>("Icons/L_IgnoreRaycast"));
             layerIcons.Add("reserved3", Resources.Load<Texture2D>("Icons/L_Reserved"));
+            layerIcons.Add("Item", Resources.Load<Texture2D>("Icons/L_Item"));
             layerIcons.Add("Water", Resources.Load<Texture2D>("Icons/L_Water"));
             layerIcons.Add("UI", Resources.Load<Texture2D>("Icons/L_UI"));
             layerIcons.Add("reserved6", Resources.Load<Texture2D>("Icons/L_Reserved"));
@@ -87,7 +88,7 @@ namespace BluWizard.Hierarchy
         //--------- SETTINGS ----------
         public class BluHierarchySettingsWindow : EditorWindow
         {
-            [MenuItem("BluWizard LABS/Enhanced Hierarchy Settings")]
+            [MenuItem("Tools/BluWizard LABS/Enhanced Hierarchy Settings")]
             public static void ShowWindow()
             {
                 GetWindow<BluHierarchySettingsWindow>("Enhanced Hierarchy Settings");
@@ -95,27 +96,52 @@ namespace BluWizard.Hierarchy
 
             void OnGUI()
             {
-                bool currentShowTransformIcon = BluHierarchySettings.ShowTransformIcon;
-                bool newShowTransformIcon = EditorGUILayout.Toggle("Show Transform Icon", currentShowTransformIcon);
-                bool currentShowLayerIcon = BluHierarchySettings.ShowLayerIcon;
-                bool currentShowHiddenComponents = BluHierarchySettings.ShowHiddenComponents;
-                bool newShowHiddenComponents = EditorGUILayout.Toggle("Show Hidden Components", currentShowHiddenComponents);
+                //---------- GUI LAYOUT APPEARANCE ----------
+                GUIStyle headerStyle = new GUIStyle(EditorStyles.label);
+                headerStyle.fontSize = 18;
+                headerStyle.fontStyle = FontStyle.Bold;
+                headerStyle.normal.textColor = new Color(0f, 0.573f, 0.851f);
 
-                if (newShowTransformIcon != currentShowTransformIcon)
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Enhanced Hierarchy", headerStyle, GUILayout.Height(28f));
+                GUILayout.Space(8);
+                GUIStyle authorStyle = new GUIStyle(EditorStyles.miniLabel);
+                authorStyle.fontSize = 12;
+                authorStyle.normal.textColor = Color.gray;
+                GUILayout.Label("BluWizard LABS", authorStyle, GUILayout.Height(22f));
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(10);
+
+                //---------- SETTINGS ----------
+                EditorGUI.BeginChangeCheck();
+
+                Rect toggleRect = EditorGUILayout.GetControlRect();
+                bool newShowGameObjectToggle = EditorGUI.Toggle(toggleRect,
+                    new GUIContent("GameObject Toggle", "Checkbox that directly activates or deactivates the GameObject locally (GameObject.SetActive)."),
+                    BluHierarchySettings.ShowGameObjectToggle);
+
+                Rect toggleRect1 = EditorGUILayout.GetControlRect();
+                bool newShowTransformIcon = EditorGUI.Toggle(toggleRect1,
+                    new GUIContent("Transform Icon", "Toggles visibility of the Transform component on the GameObject."),
+                    BluHierarchySettings.ShowTransformIcon);
+
+                Rect toggleRect2 = EditorGUILayout.GetControlRect();
+                bool newShowLayerIcon = EditorGUI.Toggle(toggleRect2,
+                    new GUIContent("Layer Icons", "Toggles icons for Unity Layers. Common for World Devs."),
+                    BluHierarchySettings.ShowLayerIcon);
+
+                Rect toggleRect3 = EditorGUILayout.GetControlRect();
+                bool newShowHiddenComponents = EditorGUI.Toggle(toggleRect3,
+                    new GUIContent("Hidden Components", "Toggles visibility of hidden scripts and components. This may show isolated UdonSharp Scripts."),
+                    BluHierarchySettings.ShowHiddenComponents);
+
+                if (EditorGUI.EndChangeCheck())
                 {
+                    BluHierarchySettings.ShowGameObjectToggle = newShowGameObjectToggle;
                     BluHierarchySettings.ShowTransformIcon = newShowTransformIcon;
-                    RepaintHierarchyWindow();
-                }
-
-                BluHierarchySettings.ShowLayerIcon = EditorGUILayout.Toggle("Show Layer Icon", BluHierarchySettings.ShowLayerIcon);
-                if (BluHierarchySettings.ShowLayerIcon != currentShowLayerIcon)
-                {
-                    EditorPrefs.SetBool("BluHierarchy_ShowLayerIcon", BluHierarchySettings.ShowLayerIcon);
-                    RepaintHierarchyWindow();
-                }
-                
-                if (newShowHiddenComponents != currentShowHiddenComponents)
-                {
+                    BluHierarchySettings.ShowLayerIcon = newShowLayerIcon;
                     BluHierarchySettings.ShowHiddenComponents = newShowHiddenComponents;
                     RepaintHierarchyWindow();
                 }
@@ -158,6 +184,7 @@ namespace BluWizard.Hierarchy
             private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
             private const string ShowLayerIconKey = "BluHierarchy_ShowLayerIcon";
             private const string ShowHiddenComponentsKey = "BluHierarchy_ShowHiddenComponents";
+            private const string ShowGameObjectToggleKey = "BluHierarchy_ShowGameObjectToggle";
 
             public static bool ShowTransformIcon
             {
@@ -169,6 +196,12 @@ namespace BluWizard.Hierarchy
             {
                 get => EditorPrefs.GetBool(ShowLayerIconKey, false);
                 set => EditorPrefs.SetBool(ShowLayerIconKey, value);
+            }
+
+            public static bool ShowGameObjectToggle
+            {
+                get => EditorPrefs.GetBool(ShowGameObjectToggleKey, true);
+                set => EditorPrefs.SetBool(ShowGameObjectToggleKey, value);
             }
             
             public static bool ShowHiddenComponents
@@ -199,16 +232,19 @@ namespace BluWizard.Hierarchy
 
             //--------- GAME OBJECT TOGGLE ----------
 
-            Rect toggleRect = new Rect(selectionRect);
-            toggleRect.x = selectionRect.xMax - 18;
-            toggleRect.width = 18;
-
-            bool isActive = EditorGUI.Toggle(toggleRect, go.activeSelf);
-            if (isActive != go.activeSelf)
+            if (BluHierarchySettings.ShowGameObjectToggle)
             {
-                Undo.RecordObject(go, "Toggle Active State");
-                go.SetActive(isActive);
-                EditorUtility.SetDirty(go);
+                Rect toggleRect = new Rect(selectionRect);
+                toggleRect.x = selectionRect.xMax - 18;
+                toggleRect.width = 18;
+
+                bool isActive = EditorGUI.Toggle(toggleRect, go.activeSelf);
+                if (isActive != go.activeSelf)
+                {
+                    Undo.RecordObject(go, "Toggle Active State");
+                    go.SetActive(isActive);
+                    EditorUtility.SetDirty(go);
+                }
             }
 
 
@@ -216,14 +252,15 @@ namespace BluWizard.Hierarchy
 
             // Start drawing component icons to the left of the toggle button
             float iconSize = 16;
-            float currentX = selectionRect.xMax - iconSize - 22;
+            float toggleOffset = BluHierarchySettings.ShowGameObjectToggle ? 22 : 4; // Use toggleOffset to control the appearance of the rest of the icons when the Game Object Toggle appearance is changed.
+            float currentX = selectionRect.xMax - iconSize - toggleOffset;
 
 
             //--------- LAYER ICON PROCESS ---------
 
             float separatorWidth = 1;
             float separatorHeight = selectionRect.height;
-            float separatorX = selectionRect.xMax - iconSize - 24 - separatorWidth;
+            float separatorX = selectionRect.xMax - iconSize - (toggleOffset + 2) - separatorWidth;
             float separatorY = selectionRect.y;
 
             if (BluHierarchySettings.ShowLayerIcon)
@@ -368,7 +405,7 @@ namespace BluWizard.Hierarchy
 
                 else if (component.GetType().Name == "d4rkAvatarOptimizer") { icon = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer"); }
 
-                // if no match, use Unity's Default Icons for everything else
+                // if no match, use Unity's Default Icons (or if the component provides one) for everything else
                 else
                 {
                     icon = GetCustomIcon(component.GetType());
