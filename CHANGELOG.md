@@ -1,3 +1,7 @@
+# v1.7.2
+- Added Warning icon for GameObjects that contain Missing Scripts.
+- Added `changelogUrl` argument to the package.json.
+
 # v1.7.1
 - Added Layer Icon for `Item`, introduced in SDK 3.8.2.
 - Updated Settings Panel with Tooltips to explain what the setting will do.
