@@ -137,12 +137,18 @@ namespace BluWizard.Hierarchy
                     new GUIContent("Hidden Components", "Toggles visibility of hidden scripts and components. This may show isolated UdonSharp Scripts."),
                     BluHierarchySettings.ShowHiddenComponents);
 
+                Rect toggleRect4 = EditorGUILayout.GetControlRect();
+                bool newShowTooltips = EditorGUI.Toggle(toggleRect4,
+                    new GUIContent("Tooltips", "Shows a Tooltip when the mouse is hovering over a component on the GameObject, telling you the name of the component. Tooltips are always enabled on Missing Scripts."),
+                    BluHierarchySettings.ShowTooltips);
+
                 if (EditorGUI.EndChangeCheck())
                 {
                     BluHierarchySettings.ShowGameObjectToggle = newShowGameObjectToggle;
                     BluHierarchySettings.ShowTransformIcon = newShowTransformIcon;
                     BluHierarchySettings.ShowLayerIcon = newShowLayerIcon;
                     BluHierarchySettings.ShowHiddenComponents = newShowHiddenComponents;
+                    BluHierarchySettings.ShowTooltips = newShowTooltips;
                     RepaintHierarchyWindow();
                 }
             }
@@ -178,13 +184,14 @@ namespace BluWizard.Hierarchy
                 return Selection.gameObjects.Length == 1;
             }
         }
-        
+
         public static class BluHierarchySettings
         {
             private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
             private const string ShowLayerIconKey = "BluHierarchy_ShowLayerIcon";
             private const string ShowHiddenComponentsKey = "BluHierarchy_ShowHiddenComponents";
             private const string ShowGameObjectToggleKey = "BluHierarchy_ShowGameObjectToggle";
+            private const string ShowTooltipsKey = "BluHierarchy_ShowTooltips";
 
             public static bool ShowTransformIcon
             {
@@ -203,23 +210,29 @@ namespace BluWizard.Hierarchy
                 get => EditorPrefs.GetBool(ShowGameObjectToggleKey, true);
                 set => EditorPrefs.SetBool(ShowGameObjectToggleKey, value);
             }
-            
+
             public static bool ShowHiddenComponents
             {
                 get => EditorPrefs.GetBool(ShowHiddenComponentsKey, false);
                 set => EditorPrefs.SetBool(ShowHiddenComponentsKey, value);
+            }
+
+            public static bool ShowTooltips
+            {
+                get => EditorPrefs.GetBool(ShowTooltipsKey, true);
+                set => EditorPrefs.SetBool(ShowTooltipsKey, value);
             }
         }
 
         public static float nextRepaintTime;
         public static void RepaintHierarchyWindow()
         {
-           if (Time.realtimeSinceStartup < nextRepaintTime) return;
+            if (Time.realtimeSinceStartup < nextRepaintTime) return;
 
-           // Optimize draw calls on repaint - fixed CPU performance on theme change?
-           nextRepaintTime = Time.realtimeSinceStartup + 0.5f;
-           // This will get all open hierarchy windows and repaint them
-           EditorApplication.RepaintHierarchyWindow();
+            // Optimize draw calls on repaint - fixed CPU performance on theme change?
+            nextRepaintTime = Time.realtimeSinceStartup + 0.5f;
+            // This will get all open hierarchy windows and repaint them
+            EditorApplication.RepaintHierarchyWindow();
         }
         //--------- END SETTINGS ----------
 
@@ -306,6 +319,8 @@ namespace BluWizard.Hierarchy
             float nameWidth = labelStyle.CalcSize(new GUIContent(go.name)).x;
             float minX = selectionRect.x + nameWidth + 8f; // Prevent drawing over the name + some spacing
             float fadeThreshold = minX + 16f; // Start fading out slightly before the cutoff
+            
+            // CONTROL MISSING SCRIPTS PROCESS
 
             int missingCount = 0;
 #if UNITY_2019_2_OR_NEWER
@@ -341,204 +356,214 @@ namespace BluWizard.Hierarchy
             }
 
             foreach (Component component in components)
+            {
+                // Check if Unity is in Play Mode
+                if (EditorApplication.isPlaying)
                 {
-                    // Check if Unity is in Play Mode
-                    if (EditorApplication.isPlaying)
-                    {
-                        // Exit the method during Play Mode to optimize performance.
-                        return;
-                    }
+                    // Exit the method during Play Mode to optimize performance.
+                    return;
+                }
 
-                    if (component == null) continue;
+                if (component == null) continue;
 
-                    if (!BluHierarchySettings.ShowHiddenComponents && (component.hideFlags & HideFlags.HideInInspector) != 0) continue;
+                if (!BluHierarchySettings.ShowHiddenComponents && (component.hideFlags & HideFlags.HideInInspector) != 0) continue;
 
-                    if (component is Transform && !BluHierarchySettings.ShowTransformIcon) continue;
+                if (component is Transform && !BluHierarchySettings.ShowTransformIcon) continue;
 
-                    Texture2D icon = null;
+                Texture2D icon = null;
 
-                    // Check for Pro Theme
-                    bool isDarkTheme = EditorGUIUtility.isProSkin;
+                // Check for Pro Theme
+                bool isDarkTheme = EditorGUIUtility.isProSkin;
 
-                    // Load Custom Icons for VRC Avatar SDK Components
-                    if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarDescriptor" : "Icons/vrcAvatarDescriptor_L"); }
-                    else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPipelineManager" : "Icons/vrcPipelineManager_L"); }
-                    else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBone" : "Icons/vrcPhysBone_L"); }
+                // Load Custom Icons for VRC Avatar SDK Components
+                if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarDescriptor" : "Icons/vrcAvatarDescriptor_L"); }
+                else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPipelineManager" : "Icons/vrcPipelineManager_L"); }
+                else if (component.GetType().Name == "VRCPhysBone") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBone" : "Icons/vrcPhysBone_L"); }
 #if VRC_SDK_VRCSDK3 // Prevent borking Script if VRC SDK does not exist in the project, as it switches the Icon depending on type of Phys Bone Collider selected.
-                    else if (component.GetType().Name == "VRCPhysBoneCollider")
+                else if (component.GetType().Name == "VRCPhysBoneCollider")
+                {
+                    var physBoneCollider = component as VRCPhysBoneCollider;
+                    switch (physBoneCollider.shapeType)
                     {
-                        var physBoneCollider = component as VRCPhysBoneCollider;
-                        switch (physBoneCollider.shapeType)
-                        {
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Plane:
-                                icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneColliderPlane" : "Icons/vrcPhysBoneColliderPlane_L");
-                                break;
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Sphere:
-                                icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
-                                break;
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Capsule:
-                                icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
-                                break;
-                        }
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Plane:
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneColliderPlane" : "Icons/vrcPhysBoneColliderPlane_L");
+                            break;
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Sphere:
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
+                            break;
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Capsule:
+                            icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
+                            break;
                     }
+                }
 #endif
-                    else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactReceiver" : "Icons/vrcContactReceiver_L"); }
-                    else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactSender" : "Icons/vrcContactSender_L"); }
-                    else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
-                    else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
-                    else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L"); }
-                    else if (component.GetType().Name == "VRCParentConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L"); }
-                    else if (component.GetType().Name == "VRCPositionConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L"); }
-                    else if (component.GetType().Name == "VRCRotationConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L"); }
-                    else if (component.GetType().Name == "VRCScaleConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
-                    else if (component.GetType().Name == "VRCAimConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
-                    else if (component.GetType().Name == "VRCLookAtConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
-                    else if (component.GetType().Name == "VRCPerPlatformOverrides") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPerPlatformOverrides" : "Icons/vrcPerPlatformOverrides"); }
+                else if (component.GetType().Name == "VRCContactReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactReceiver" : "Icons/vrcContactReceiver_L"); }
+                else if (component.GetType().Name == "VRCContactSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactSender" : "Icons/vrcContactSender_L"); }
+                else if (component.GetType().Name == "VRCImpostorSettings") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
+                else if (component.GetType().Name == "VRCImpostorEnvironment") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L"); }
+                else if (component.GetType().Name == "VRCHeadChop") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L"); }
+                else if (component.GetType().Name == "VRCParentConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L"); }
+                else if (component.GetType().Name == "VRCPositionConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L"); }
+                else if (component.GetType().Name == "VRCRotationConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L"); }
+                else if (component.GetType().Name == "VRCScaleConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L"); }
+                else if (component.GetType().Name == "VRCAimConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L"); }
+                else if (component.GetType().Name == "VRCLookAtConstraint") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L"); }
+                else if (component.GetType().Name == "VRCPerPlatformOverrides") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPerPlatformOverrides" : "Icons/vrcPerPlatformOverrides"); }
 
-                    // Load Custom Icons for VRC World SDK Components
-                    else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
-                    else if (component.GetType().Name == "UdonBehaviour") { icon = Resources.Load<Texture2D>("Icons/vrcUdonBehaviour"); }
-                    else if (component.GetType().Name == "VRCPickup") { icon = Resources.Load<Texture2D>("Icons/vrcPickup"); }
-                    else if (component.GetType().Name == "VRCMirrorReflection") { icon = Resources.Load<Texture2D>("Icons/vrcMirrorReflection"); }
-                    else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcStation" : "Icons/vrcStation_L"); }
-                    else if (component.GetType().Name == "VRCObjectSync") { icon = Resources.Load<Texture2D>("Icons/vrcObjectSync"); }
-                    else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
-                    else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
-                    else if (component.GetType().Name == "VRCAvatarPedestal") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal"); }
-                    else if (component.GetType().Name == "VRCAVProVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoPlayer"); }
-                    else if (component.GetType().Name == "VRCAVProVideoScreen") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoScreen"); }
-                    else if (component.GetType().Name == "VRCAVProVideoSpeaker") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoSpeaker"); }
-                    else if (component.GetType().Name == "VRCSpatialAudioSource") { icon = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource"); }
-                    else if (component.GetType().Name == "VRCUiShape") { icon = Resources.Load<Texture2D>("Icons/vrcUiShape"); }
-                    else if (component.GetType().Name == "VRCUnityVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcUnityVideoPlayer"); }
-                    else if (component.GetType().Name == "VRCUrlInputField") { icon = Resources.Load<Texture2D>("Icons/vrcURLInputField"); }
+                // Load Custom Icons for VRC World SDK Components
+                else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
+                else if (component.GetType().Name == "UdonBehaviour") { icon = Resources.Load<Texture2D>("Icons/vrcUdonBehaviour"); }
+                else if (component.GetType().Name == "VRCPickup") { icon = Resources.Load<Texture2D>("Icons/vrcPickup"); }
+                else if (component.GetType().Name == "VRCMirrorReflection") { icon = Resources.Load<Texture2D>("Icons/vrcMirrorReflection"); }
+                else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcStation" : "Icons/vrcStation_L"); }
+                else if (component.GetType().Name == "VRCObjectSync") { icon = Resources.Load<Texture2D>("Icons/vrcObjectSync"); }
+                else if (component.GetType().Name == "VRCObjectPool") { icon = Resources.Load<Texture2D>("Icons/vrcObjectPool"); }
+                else if (component.GetType().Name == "VRCPortalMarker") { icon = Resources.Load<Texture2D>("Icons/vrcPortalMarker"); }
+                else if (component.GetType().Name == "VRCAvatarPedestal") { icon = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal"); }
+                else if (component.GetType().Name == "VRCAVProVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoPlayer"); }
+                else if (component.GetType().Name == "VRCAVProVideoScreen") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoScreen"); }
+                else if (component.GetType().Name == "VRCAVProVideoSpeaker") { icon = Resources.Load<Texture2D>("Icons/vrcAVProVideoSpeaker"); }
+                else if (component.GetType().Name == "VRCSpatialAudioSource") { icon = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource"); }
+                else if (component.GetType().Name == "VRCUiShape") { icon = Resources.Load<Texture2D>("Icons/vrcUiShape"); }
+                else if (component.GetType().Name == "VRCUnityVideoPlayer") { icon = Resources.Load<Texture2D>("Icons/vrcUnityVideoPlayer"); }
+                else if (component.GetType().Name == "VRCUrlInputField") { icon = Resources.Load<Texture2D>("Icons/vrcURLInputField"); }
 
-                    // Load Custom Icons for Third-Party Utility Components
-                    else if (component.GetType().Name == "VRCFury") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                    else if (component.GetType().Name == "VRCFuryComponent") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
-                    else if (component.GetType().Name == "VRCFuryGlobalCollider") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryGlobalCollider" : "Icons/VRCFuryGlobalCollider_L"); }
-                    else if (component.GetType().Name == "VRCFuryHapticPlug") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFurySPSPlug" : "Icons/VRCFurySPSPlug_L"); }
-                    else if (component.GetType().Name == "VRCFuryHapticSocket") { icon = Resources.Load<Texture2D>("Icons/VRCFurySPSSocket"); }
-                    else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticReceiver" : "Icons/VRCFuryHapticReceiver_L"); }
-                    else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticSender" : "Icons/VRCFuryHapticSender_L"); }
+                // Load Custom Icons for Third-Party Utility Components
+                else if (component.GetType().Name == "VRCFury") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
+                else if (component.GetType().Name == "VRCFuryComponent") { icon = Resources.Load<Texture2D>("Icons/VRCFury"); }
+                else if (component.GetType().Name == "VRCFuryGlobalCollider") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryGlobalCollider" : "Icons/VRCFuryGlobalCollider_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticPlug") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFurySPSPlug" : "Icons/VRCFurySPSPlug_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticSocket") { icon = Resources.Load<Texture2D>("Icons/VRCFurySPSSocket"); }
+                else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticReceiver" : "Icons/VRCFuryHapticReceiver_L"); }
+                else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticSender" : "Icons/VRCFuryHapticSender_L"); }
 
-                    else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryPointLight"); }
-                    else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryLightMesh"); }
-                    else if (component.GetType().Name == "BakeryDirectLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
-                    else if (component.GetType().Name == "BakerySkyLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
-                    else if (component.GetType().Name == "BakeryLightmapGroupSelector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                    else if (component.GetType().Name == "BakeryLightmappedPrefab") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                    else if (component.GetType().Name == "BakeryPackAsSingleSquare") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                    else if (component.GetType().Name == "BakerySector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
-                    else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryVolume"); }
-                    else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryPointLight"); }
+                else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryLightMesh"); }
+                else if (component.GetType().Name == "BakeryDirectLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
+                else if (component.GetType().Name == "BakerySkyLight") { icon = Resources.Load<Texture2D>("Icons/bakeryDirectLight"); }
+                else if (component.GetType().Name == "BakeryLightmapGroupSelector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryLightmappedPrefab") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryPackAsSingleSquare") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakerySector") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
+                else if (component.GetType().Name == "BakeryVolume") { icon = Resources.Load<Texture2D>("Icons/bakeryVolume"); }
+                else if (component.GetType().Name == "ftLightmapsStorage") { icon = Resources.Load<Texture2D>("Icons/bakeryGeneric"); }
 
-                    else if (component.GetType().Name == "d4rkAvatarOptimizer") { icon = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer"); }
+                else if (component.GetType().Name == "d4rkAvatarOptimizer") { icon = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer"); }
 
-                    // if no match, use Unity's Default Icons (or if the component provides one) for everything else
-                    else
+                // if no match, use Unity's Default Icons (or if the component provides one) for everything else
+                else
+                {
+                    icon = GetCustomIcon(component.GetType());
+                }
+
+                if (icon == null)
+                {
+                    GUIContent iconContent = EditorGUIUtility.ObjectContent(component, component.GetType());
+                    icon = iconContent.image as Texture2D;
+                }
+
+                Rect iconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
+
+                // --- FADE OUT / SKIP ICON IF OVERLAPPING NAME ---
+                if (currentX < minX)
+                    break;
+
+                float alpha = 1f;
+                if (currentX < fadeThreshold)
+                    alpha = Mathf.InverseLerp(minX, fadeThreshold, currentX);
+
+                bool isEnabled = false;
+                bool canToggle = false;
+
+                // Check for components that can be toggled and set the isEnabled flag
+                if (component is Behaviour behaviourComponent)
+                {
+                    isEnabled = behaviourComponent.enabled;
+                    canToggle = true;
+                }
+                else if (component is Renderer rendererComponent)
+                {
+                    isEnabled = rendererComponent.enabled;
+                    canToggle = true;
+                }
+                else
+                {
+                    var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                    if (enabledProp != null && enabledProp.PropertyType == typeof(bool))
                     {
-                        icon = GetCustomIcon(component.GetType());
-                    }
-
-                    if (icon == null)
-                    {
-                        GUIContent iconContent = EditorGUIUtility.ObjectContent(component, component.GetType());
-                        icon = iconContent.image as Texture2D;
-                    }
-
-                    Rect iconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
-
-                    // --- FADE OUT / SKIP ICON IF OVERLAPPING NAME ---
-                    if (currentX < minX)
-                        break;
-
-                    float alpha = 1f;
-                    if (currentX < fadeThreshold)
-                        alpha = Mathf.InverseLerp(minX, fadeThreshold, currentX);
-
-                    bool isEnabled = false;
-                    bool canToggle = false;
-
-                    // Check for components that can be toggled and set the isEnabled flag
-                    if (component is Behaviour behaviourComponent)
-                    {
-                        isEnabled = behaviourComponent.enabled;
+                        isEnabled = (bool)enabledProp.GetValue(component, null);
                         canToggle = true;
                     }
-                    else if (component is Renderer rendererComponent)
+                }
+
+                // Component Toggle functionality
+                if (!canToggle && component is Component)
+                {
+                    PropertyInfo enabledProperty = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                    if (enabledProperty != null && enabledProperty.PropertyType == typeof(bool))
                     {
-                        isEnabled = rendererComponent.enabled;
+                        isEnabled = (bool)enabledProperty.GetValue(component, null);
                         canToggle = true;
                     }
-                    else
-                    {
-                        var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
-                        if (enabledProp != null && enabledProp.PropertyType == typeof(bool))
-                        {
-                            isEnabled = (bool)enabledProp.GetValue(component, null);
-                            canToggle = true;
-                        }
-                    }
+                }
 
-                    // Component Toggle functionality
-                    if (!canToggle && component is Component)
-                    {
-                        PropertyInfo enabledProperty = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
-                        if (enabledProperty != null && enabledProperty.PropertyType == typeof(bool))
-                        {
-                            isEnabled = (bool)enabledProperty.GetValue(component, null);
-                            canToggle = true;
-                        }
-                    }
+                // Collider Component Toggle functionality
+                if (component is Collider colliderComponent)
+                {
+                    isEnabled = colliderComponent.enabled;
+                    canToggle = true;
 
-                    // Collider Component Toggle functionality
-                    if (component is Collider colliderComponent)
-                    {
-                        isEnabled = colliderComponent.enabled;
-                        canToggle = true;
-
-                        if (canToggle && GUI.Button(iconRect, GUIContent.none, GUIStyle.none))
-                        {
-                            Undo.RecordObject(colliderComponent, "Toggle Collider");
-                            colliderComponent.enabled = !isEnabled;
-                            EditorUtility.SetDirty(colliderComponent);
-                        }
-                    }
-
-                    // Set the color for the icon based on the enabled state and if it's toggleable
-                    Color prevColor = GUI.color;
-                    GUI.color = canToggle ? (isEnabled ? new Color(1f, 1f, 1f, alpha) : new Color(1f, 1f, 1f, 0.5f * alpha)) : new Color(1f, 1f, 1f, alpha);
-
-                    // Draw the texture with the modified color
-                    GUI.DrawTexture(iconRect, icon);
-
-                    // Reset color to previous state
-                    GUI.color = prevColor;
-
-                    // Only add button functionality if the component can be toggled
                     if (canToggle && GUI.Button(iconRect, GUIContent.none, GUIStyle.none))
                     {
-                        Undo.RecordObject(component, "Toggle Component");
-                        isEnabled = !isEnabled;
+                        Undo.RecordObject(colliderComponent, "Toggle Collider");
+                        colliderComponent.enabled = !isEnabled;
+                        EditorUtility.SetDirty(colliderComponent);
+                    }
+                }
 
-                        // Apply the toggled state back to the component
+                string tooltip = BluHierarchySettings.ShowTooltips ? ObjectNames.NicifyVariableName(component.GetType().Name) : null;
+
+                float disabledAlpha = (canToggle && !isEnabled) ? 0.5f : 1f;
+                float finalAlpha = disabledAlpha * alpha;
+
+                // Draw the icon WITH a tooltip; use Label when not toggleable, Button when toggleable
+                Color prevColor = GUI.color;
+                GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, finalAlpha);
+
+                GUIContent iconContentWithTooltip = new GUIContent(icon, tooltip);
+
+                if (canToggle)
+                {
+                    if (GUI.Button(iconRect, iconContentWithTooltip, GUIStyle.none))
+                    {
+                        Undo.RecordObject(component, "Toggle Component");
+                        bool newEnabled = !isEnabled;
+
                         if (component is Behaviour)
-                        {
-                            (component as Behaviour).enabled = isEnabled;
-                        }
+                            ((Behaviour)component).enabled = newEnabled;
                         else if (component is Renderer)
+                            ((Renderer)component).enabled = newEnabled;
+                        else
                         {
-                            (component as Renderer).enabled = isEnabled;
+                            var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+                            if (enabledProp != null && enabledProp.PropertyType == typeof(bool))
+                                enabledProp.SetValue(component, newEnabled, null);
                         }
 
                         EditorUtility.SetDirty(component);
                     }
-
-                    // Adjust currentX for the next icon
-                    currentX -= iconSize + 2; // Move to the next icon
-
                 }
+                else
+                {
+                    GUI.Label(iconRect, new GUIContent(icon, tooltip), new GUIStyle() { imagePosition = ImagePosition.ImageOnly });
+                }
+
+                GUI.color = prevColor;
+
+                // Adjust currentX for the next icon
+                currentX -= iconSize + 2; // Move to the next icon
+
+            }
             // Draw EditorOnly Text
             DrawEditorOnlyText(go, selectionRect);
         }

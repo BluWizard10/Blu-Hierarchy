@@ -1,6 +1,9 @@
+# v1.7.3
+- Added Tooltips when hovering over component icons. Will read the name of the component when hovered.
+
 # v1.7.2
 - Added Warning icon for GameObjects that contain Missing Scripts.
-- Added `changelogUrl` argument to the package.json.
+- Added `changelogUrl` argument to the package.json. This allows ALCOM (and future Creator Companion versions) to directly link to my changelogs.
 
 # v1.7.1
 - Added Layer Icon for `Item`, introduced in SDK 3.8.2.
