@@ -40,6 +40,10 @@ namespace BluWizard.Hierarchy
         private static Dictionary<string, Texture2D> layerIcons = new Dictionary<string, Texture2D>();
         private static Dictionary<System.Type, Texture2D> customComponentIcons = new Dictionary<System.Type, Texture2D>();
 
+        private static bool s_DragToggling = false;
+        private static bool s_TargetActiveState = false;
+        private static bool s_SuppressNextMouseUp = false;
+
         public static void LoadLayerIcons()
         {
             // Check if Unity is in Play Mode
@@ -119,7 +123,7 @@ namespace BluWizard.Hierarchy
 
                 Rect toggleRect = EditorGUILayout.GetControlRect();
                 bool newShowGameObjectToggle = EditorGUI.Toggle(toggleRect,
-                    new GUIContent("GameObject Toggle", "Checkbox that directly activates or deactivates the GameObject locally (GameObject.SetActive)."),
+                    new GUIContent("GameObject Toggle", "Main checkbox that directly activates or deactivates the GameObject locally (GameObject.SetActive)."),
                     BluHierarchySettings.ShowGameObjectToggle);
 
                 Rect toggleRect1 = EditorGUILayout.GetControlRect();
@@ -139,8 +143,13 @@ namespace BluWizard.Hierarchy
 
                 Rect toggleRect4 = EditorGUILayout.GetControlRect();
                 bool newShowTooltips = EditorGUI.Toggle(toggleRect4,
-                    new GUIContent("Tooltips", "Shows a Tooltip when the mouse is hovering over a component on the GameObject, telling you the name of the component. Tooltips are always enabled on Missing Scripts."),
+                    new GUIContent("Tooltips", "Shows a Tooltip when the mouse is hovering over a component on the GameObject, telling you the name of the component.\n\nTooltips are always enabled on Missing Scripts."),
                     BluHierarchySettings.ShowTooltips);
+
+                Rect toggleRect5 = EditorGUILayout.GetControlRect();
+                bool newEnableDragToToggle = EditorGUI.Toggle(toggleRect5,
+                    new GUIContent("Drag-to-Toggle", "Enables the ability to click and drag across the GameObject Toggles in the Hierarchy to toggle multiple at once.\n\nHold down ALT on your keyboard to activate this function."),
+                    BluHierarchySettings.EnableDragToToggle);
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -149,8 +158,33 @@ namespace BluWizard.Hierarchy
                     BluHierarchySettings.ShowLayerIcon = newShowLayerIcon;
                     BluHierarchySettings.ShowHiddenComponents = newShowHiddenComponents;
                     BluHierarchySettings.ShowTooltips = newShowTooltips;
+                    BluHierarchySettings.EnableDragToToggle = newEnableDragToToggle;
                     RepaintHierarchyWindow();
                 }
+
+                GUILayout.Space(10);
+
+                EditorGUILayout.HelpBox("Reset all Enhanced Hierarchy settings to their factory defaults.", MessageType.Info);
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button(new GUIContent("Reset to Defaults", "Restore all Enhanced Hierarchy settings to their default values."), GUILayout.Height(22)))
+                {
+                    bool confirm = EditorUtility.DisplayDialog(
+                        "Reset Enhanced Hierarchy Settings",
+                        "This will restore all Enhanced Hierarchy settings to their factory defaults.\n\nAre you sure?",
+                        "Reset",
+                        "Cancel"
+                    );
+
+                    if (confirm)
+                    {
+                        BluHierarchySettings.ResetToDefaults();
+                        Repaint();
+                        Debug.Log("[<color=#0092d9>BluWizard LABS</color>] Enhanced Hierarchy Settings have been reset.");
+                    }
+                }
+                GUILayout.EndHorizontal();
             }
         }
 
@@ -192,6 +226,7 @@ namespace BluWizard.Hierarchy
             private const string ShowHiddenComponentsKey = "BluHierarchy_ShowHiddenComponents";
             private const string ShowGameObjectToggleKey = "BluHierarchy_ShowGameObjectToggle";
             private const string ShowTooltipsKey = "BluHierarchy_ShowTooltips";
+            private const string EnableDragToToggleKey = "BluHierarchy_EnableDragToToggle";
 
             public static bool ShowTransformIcon
             {
@@ -222,6 +257,31 @@ namespace BluWizard.Hierarchy
                 get => EditorPrefs.GetBool(ShowTooltipsKey, true);
                 set => EditorPrefs.SetBool(ShowTooltipsKey, value);
             }
+
+            public static bool EnableDragToToggle
+            {
+                get => EditorPrefs.GetBool(EnableDragToToggleKey, true);
+                set => EditorPrefs.SetBool(EnableDragToToggleKey, value);
+            }
+
+            public static void ResetToDefaults(bool repaint = true)
+            {
+                string[] keys =
+                {
+                    ShowGameObjectToggleKey,
+                    ShowTransformIconKey,
+                    ShowLayerIconKey,
+                    ShowHiddenComponentsKey,
+                    ShowTooltipsKey,
+                    EnableDragToToggleKey,
+                };
+
+                foreach (var k in keys)
+                    EditorPrefs.DeleteKey(k);
+
+                if (repaint)
+                    RepaintHierarchyWindow();
+            }
         }
 
         public static float nextRepaintTime;
@@ -251,15 +311,59 @@ namespace BluWizard.Hierarchy
                 toggleRect.x = selectionRect.xMax - 18;
                 toggleRect.width = 18;
 
-                bool isActive = EditorGUI.Toggle(toggleRect, go.activeSelf);
-                if (isActive != go.activeSelf)
+                Event e = Event.current;
+
+                if (BluHierarchySettings.EnableDragToToggle)
+                {
+                    if (e.type == EventType.MouseDown && e.alt && e.button == 0 && toggleRect.Contains(e.mousePosition))
+                    {
+                        Undo.RecordObject(go, "Toggle Active State");
+                        bool newState = !go.activeSelf;
+                        go.SetActive(newState);
+                        EditorUtility.SetDirty(go);
+
+                        s_DragToggling = true;
+                        s_TargetActiveState = newState;
+                        s_SuppressNextMouseUp = true;
+
+                        e.Use();
+                        RepaintHierarchyWindow();
+                    }
+                    else if (s_DragToggling && (e.type == EventType.MouseDrag || e.type == EventType.MouseMove))
+                    {
+                        if (toggleRect.Contains(e.mousePosition) && go.activeSelf != s_TargetActiveState)
+                        {
+                            Undo.RecordObject(go, "Toggle Active State (Drag)");
+                            go.SetActive(s_TargetActiveState);
+                            EditorUtility.SetDirty(go);
+                            e.Use();
+                            RepaintHierarchyWindow();
+                        }
+                    }
+                    else if (e.type == EventType.MouseUp && e.button == 0)
+                    {
+                        if (s_SuppressNextMouseUp)
+                        {
+                            e.Use();
+                        }
+                        s_DragToggling = false;
+                        s_SuppressNextMouseUp = false;
+                    }
+                }
+
+                bool isActive = go.activeSelf;
+                EditorGUI.BeginDisabledGroup(s_DragToggling);
+                bool uiState = EditorGUI.Toggle(toggleRect, isActive);
+                EditorGUI.EndDisabledGroup();
+
+                if ((!BluHierarchySettings.EnableDragToToggle || !s_DragToggling) && uiState != isActive)
                 {
                     Undo.RecordObject(go, "Toggle Active State");
-                    go.SetActive(isActive);
+                    go.SetActive(uiState);
                     EditorUtility.SetDirty(go);
+                    RepaintHierarchyWindow();
                 }
             }
-
 
             //--------- ICONS ---------
 
@@ -319,7 +423,7 @@ namespace BluWizard.Hierarchy
             float nameWidth = labelStyle.CalcSize(new GUIContent(go.name)).x;
             float minX = selectionRect.x + nameWidth + 8f; // Prevent drawing over the name + some spacing
             float fadeThreshold = minX + 16f; // Start fading out slightly before the cutoff
-            
+
             // CONTROL MISSING SCRIPTS PROCESS
 
             int missingCount = 0;

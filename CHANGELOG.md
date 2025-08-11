@@ -1,3 +1,8 @@
+# v1.8.0
+- The GameObject Toggles now support "Drag-to-Toggle", a power user feature that allows you to drag to toggle multiple GameObjects at once. Enabled by default.
+  - To activate the function, hold ALT on your keyboard.
+- Added button in Settings that resets all settings to the defaults.
+
 # v1.7.3
 - Added Tooltips when hovering over component icons. Will read the name of the component when hovered.
 
