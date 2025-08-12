@@ -138,7 +138,7 @@ namespace BluWizard.Hierarchy
 
                 Rect toggleRect3 = EditorGUILayout.GetControlRect();
                 bool newShowHiddenComponents = EditorGUI.Toggle(toggleRect3,
-                    new GUIContent("Hidden Components", "Toggles visibility of hidden scripts and components. This may show isolated UdonSharp Scripts."),
+                    new GUIContent("Hidden Components", "Toggles visibility of hidden scripts and components. This may show isolated Scripts of any kind."),
                     BluHierarchySettings.ShowHiddenComponents);
 
                 Rect toggleRect4 = EditorGUILayout.GetControlRect();
@@ -296,6 +296,13 @@ namespace BluWizard.Hierarchy
         }
         //--------- END SETTINGS ----------
 
+        // Helper for UdonSharpBehaviour Icons
+        private static bool IsDefaultCSharpScriptIcon(Texture2D tex)
+        {
+            if (tex == null) return true;
+            var cs = EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D;
+            return ReferenceEquals(tex, cs);
+        }
 
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
         {
@@ -479,6 +486,8 @@ namespace BluWizard.Hierarchy
                 // Check for Pro Theme
                 bool isDarkTheme = EditorGUIUtility.isProSkin;
 
+                string tooltip = BluHierarchySettings.ShowTooltips ? ObjectNames.NicifyVariableName(component.GetType().Name) : null;
+
                 // Load Custom Icons for VRC Avatar SDK Components
                 if (component.GetType().Name == "VRCAvatarDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarDescriptor" : "Icons/vrcAvatarDescriptor_L"); }
                 else if (component.GetType().Name == "PipelineManager") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPipelineManager" : "Icons/vrcPipelineManager_L"); }
@@ -517,6 +526,38 @@ namespace BluWizard.Hierarchy
                 // Load Custom Icons for VRC World SDK Components
                 else if (component.GetType().Name == "VRCSceneDescriptor") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L"); }
                 else if (component.GetType().Name == "UdonBehaviour") { icon = Resources.Load<Texture2D>("Icons/vrcUdonBehaviour"); }
+                else if (component.GetType().Name == "UdonSharpBehaviour" || (component.GetType().BaseType != null && component.GetType().BaseType.Name == "UdonSharpBehaviour"))
+                {
+                    Texture2D scriptIcon = null;
+                    string toolTipLocal = null;
+
+#if UNITY_EDITOR
+                    var mb = component as MonoBehaviour;
+                    if (mb != null)
+                    {
+                        var monoScript = UnityEditor.MonoScript.FromMonoBehaviour(mb);
+                        if (monoScript != null)
+                        {
+                            var gc = EditorGUIUtility.ObjectContent(monoScript, typeof(UnityEditor.MonoScript));
+                            var candidate = gc.image as Texture2D;
+
+                            if (!IsDefaultCSharpScriptIcon(candidate))
+                                scriptIcon = candidate;
+
+                            if (BluHierarchySettings.ShowTooltips)
+                            {
+                                var cls = monoScript.GetClass();
+                                string className = cls != null ? cls.Name : monoScript.name;
+                                toolTipLocal = $"Udon Sharp Behaviour ({className})";
+                            }
+                        }
+                    }
+#endif
+                    icon = scriptIcon != null ? scriptIcon : Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
+
+                    if (BluHierarchySettings.ShowTooltips)
+                        tooltip = toolTipLocal ?? "Udon Sharp Behaviour";
+                }
                 else if (component.GetType().Name == "VRCPickup") { icon = Resources.Load<Texture2D>("Icons/vrcPickup"); }
                 else if (component.GetType().Name == "VRCMirrorReflection") { icon = Resources.Load<Texture2D>("Icons/vrcMirrorReflection"); }
                 else if (component.GetType().Name == "VRCStation") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcStation" : "Icons/vrcStation_L"); }
@@ -624,8 +665,6 @@ namespace BluWizard.Hierarchy
                         EditorUtility.SetDirty(colliderComponent);
                     }
                 }
-
-                string tooltip = BluHierarchySettings.ShowTooltips ? ObjectNames.NicifyVariableName(component.GetType().Name) : null;
 
                 float disabledAlpha = (canToggle && !isEnabled) ? 0.5f : 1f;
                 float finalAlpha = disabledAlpha * alpha;

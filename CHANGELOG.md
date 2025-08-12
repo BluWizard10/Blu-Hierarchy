@@ -1,3 +1,6 @@
+# v1.8.1
+- Updated Udon Behaviour icon and added icon for Udon Sharp Behaviours.
+
 # v1.8.0
 - The GameObject Toggles now support "Drag-to-Toggle", a power user feature that allows you to drag to toggle multiple GameObjects at once. Enabled by default.
   - To activate the function, hold ALT on your keyboard.
