@@ -581,6 +581,8 @@ namespace BluWizard.Hierarchy
                 else if (component.GetType().Name == "VRCFuryHapticSocket") { icon = Resources.Load<Texture2D>("Icons/VRCFurySPSSocket"); }
                 else if (component.GetType().Name == "VRCFuryHapticTouchReceiver") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticReceiver" : "Icons/VRCFuryHapticReceiver_L"); }
                 else if (component.GetType().Name == "VRCFuryHapticTouchSender") { icon = Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticSender" : "Icons/VRCFuryHapticSender_L"); }
+                else if (component.GetType().Name == "VRCFuryDebugInfo") { icon = Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");  }
+                else if (component.GetType().Name == "VRCFuryTest") { icon = Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");  }
 
                 else if (component.GetType().Name == "BakeryPointLight") { icon = Resources.Load<Texture2D>("Icons/bakeryPointLight"); }
                 else if (component.GetType().Name == "BakeryLightMesh") { icon = Resources.Load<Texture2D>("Icons/bakeryLightMesh"); }

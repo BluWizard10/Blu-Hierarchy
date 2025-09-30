@@ -1,3 +1,6 @@
+# v1.8.2
+- Added Icon for VRCFury Debug Info component. Only seen on Editor Test Copies of VRCFury-built Avatars.
+
 # v1.8.1
 - Updated Udon Behaviour icon and added icon for Udon Sharp Behaviours.
 
