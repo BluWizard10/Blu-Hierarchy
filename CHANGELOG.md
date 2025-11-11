@@ -1,3 +1,11 @@
+# v1.9.0
+- Changed Icon logic to a more optimized `switch (typeName) {}` statement method.
+- Changed Settings Panel: Removed panel and moved them into a dropdown-menu format under `Tools/BluWizard Labs/Enhanced Hierarchy Settings/`.
+- Added setting to show Icons in Play Mode. Off by default.
+- Adjusted contrast on some Icons for better consistency.
+- File-like Icons have rounded corners now.
+- New Icons added for recently-added VRC Components.
+
 # v1.8.2
 - Added Icon for VRCFury Debug Info component. Only seen on Editor Test Copies of VRCFury-built Avatars.
 
