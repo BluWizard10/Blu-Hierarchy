@@ -1,3 +1,6 @@
+# v1.9.1
+- Fixed Workflow Dispatch to exclude .git directories.
+
 # v1.9.0
 - Changed Icon logic to a more optimized `switch (typeName) {}` statement method.
 - Changed Settings Panel: Removed panel and moved them into a dropdown-menu format under `Tools/BluWizard Labs/Enhanced Hierarchy Settings/`.
