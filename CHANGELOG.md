@@ -1,3 +1,6 @@
+# v10.0.0
+- Reorganized all code to allow modularity. This should make adjusting code and adding features far easier in the near future.
+
 # v1.9.1
 - Fixed Workflow Dispatch to exclude .git directories.
 

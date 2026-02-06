@@ -1,6 +1,6 @@
 {
     "name": "BluHierarchy.Editor",
-    "rootNamespace": "BluWizard",
+    "rootNamespace": "BluWizard.Hierarchy",
     "references": [
         "BluHierarchy"
     ],
