@@ -32,7 +32,12 @@ namespace BluWizard.Hierarchy
 
             // Convert the instance ID to a GameObject
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-            if (go == null) return;
+            if (go == null)
+            {
+                // Scene Headers are not GameObjects. If the Hierarchy item is a Scene header, draw Scene buttons.
+                SceneHeader.Draw(instanceID, selectionRect);
+                return;
+            }
 
             // ---------- GAME OBJECT TOGGLE ----------
             float toggleOffset = GameObjectToggle.Draw(go, selectionRect);

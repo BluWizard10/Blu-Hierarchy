@@ -1,5 +1,8 @@
 # v10.0.0
 - Reorganized all code to allow modularity. This should make adjusting code and adding features far easier in the near future.
+- Added Buttons to the Scene Header when more than 1 Scene is in the project.
+  - `Load/Unload Scene` button toggles the Scene to be Loaded or Unloaded on click.
+  - `Set Active` button will make a Scene be set as the Active Scene. Button only appears for Scenes that are not currently set as Active.
 
 # v1.9.1
 - Fixed Workflow Dispatch to exclude .git directories.
