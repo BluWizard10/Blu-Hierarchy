@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace BluWizard.Hierarchy
             if (!hasScene)
             {
                 // If no scene handle, try SceneAsset
-                Object obj = EditorUtility.InstanceIDToObject(instanceID);
+                UnityEngine.Object obj = EditorUtility.InstanceIDToObject(instanceID);
                 sceneAsset = obj as SceneAsset;
                 if (sceneAsset == null) return;
 
@@ -111,9 +112,16 @@ namespace BluWizard.Hierarchy
 
         private static bool ShouldShowSceneHeaderButtons()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) return false;
+            if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode) return false;
             
-            return EditorSceneManager.GetSceneManagerSetup().Length > 1;
+            try
+            {
+                return EditorSceneManager.GetSceneManagerSetup().Length > 1;
+            }
+            catch (InvalidOperationException)
+            {
+                return EditorSceneManager.sceneCount > 1;
+            }
         }
 
         private static bool TryGetLoadedSceneByPath(string scenePath, out Scene scene)
