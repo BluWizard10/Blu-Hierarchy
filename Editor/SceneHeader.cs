@@ -111,6 +111,8 @@ namespace BluWizard.Hierarchy
 
         private static bool ShouldShowSceneHeaderButtons()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return false;
+            
             return EditorSceneManager.GetSceneManagerSetup().Length > 1;
         }
 

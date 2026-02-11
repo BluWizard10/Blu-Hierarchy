@@ -3,6 +3,7 @@
 - Added Buttons to the Scene Header when more than 1 Scene is in the project.
   - `Load/Unload Scene` button toggles the Scene to be Loaded or Unloaded on click.
   - `Set Active` button will make a Scene be set as the Active Scene. Button only appears for Scenes that are not currently set as Active.
+  - *Dev Note: I had to use a very cursed method to draw the buttons since Scene Headers are not treated as an object. It would have been even more cursed to use System.Reflection, but thankfully I avoided that!*
 
 # v1.9.1
 - Fixed Workflow Dispatch to exclude .git directories.
