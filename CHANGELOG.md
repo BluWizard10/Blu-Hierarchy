@@ -1,3 +1,6 @@
+# v10.0.0
+- Full release. See `10.0.0-beta.x` changelogs below for the complete changes.
+
 # v10.0.0-beta.4
 - Added `try{}catch{}` to avoid InvalidOperationException on Play Mode Change.
 
