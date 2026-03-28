@@ -1,3 +1,6 @@
+# v10.0.1
+- Added Icon for `VRC Raycast` component, introduced in VRChat SDK 3.10.3.
+
 # v10.0.0
 - Full release. See `10.0.0-beta.x` changelogs below for the complete changes.
 

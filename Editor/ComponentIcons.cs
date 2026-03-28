@@ -65,6 +65,7 @@ namespace BluWizard.Hierarchy
                 case "VRCHeadChop": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L");
                 case "VRCImpostorSettings": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L");
                 case "VRCImpostorEnvironment": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L");
+                case "VRCRaycast": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRaycast" : "Icons/vrcRaycast_L");
 
                 // VRC Worlds SDK
                 case "VRCSceneDescriptor": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L");
