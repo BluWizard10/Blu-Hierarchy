@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+#if VRC_SDK_VRCSDK3 // Prevent breaking script if VRC SDK does not exist in the project.
 using VRC.SDK3.Dynamics.PhysBone.Components;
+#endif
 
 namespace BluWizard.Hierarchy
 {

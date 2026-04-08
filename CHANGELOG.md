@@ -1,3 +1,6 @@
+# v1.10.2
+- Re-added `#if VRC_SDK_VRCSDK3` for `using VRC.SDK3.Dynamics.PhysBone.Components;` to prevent breaking the script in non-VRChat projects.
+
 # v1.10.1
 - Added Icon for `VRC Raycast` component, introduced in VRChat SDK 3.10.3.
 
