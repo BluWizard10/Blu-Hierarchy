@@ -108,6 +108,8 @@ namespace BluWizard.Hierarchy
                     }
                     break;
                 }
+                #else
+                case "VRCPhysBoneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
                 #endif
                 case "VRCContactReceiver": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactReceiver" : "Icons/vrcContactReceiver_L");
                 case "VRCContactSender": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactSender" : "Icons/vrcContactSender_L");
@@ -144,6 +146,17 @@ namespace BluWizard.Hierarchy
                 case "d4rkAvatarOptimizer": return Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer");
 
                 case "GestureManager": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/gestureManager" : "Icons/gestureManager_L");
+
+                // Other Component Types
+                case "VRMMeta": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmMeta" : "Icons/vrmMeta_L");
+                case "VRMBlendShapeProxy": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmBlendShapeProxy" : "Icons/vrmBlendShapeProxy_L");
+                case "VRMSpringBone": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmSpringBone" : "Icons/vrmSpringBone_L");
+                case "VRMSpringBoneColliderGroup": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmSpringBoneColliderGroup" : "Icons/vrmSpringBoneColliderGroup_L");
+                
+                case "DynamicBone": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBone" : "Icons/dynamicBone_L");
+                case "DynamicBoneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBoneCollider" : "Icons/dynamicBoneCollider_L");
+                case "DynamicBoneColliderBase": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBoneCollider" : "Icons/dynamicBoneCollider_L");
+                case "DynamicBonePlaneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBonePlaneCollider" : "Icons/dynamicBonePlaneCollider_L");
             }
 
             // Custom-per-type override, then Unity fallback

@@ -1,3 +1,6 @@
+# v1.10.3
+- Added Icons for VRM users (but really, you should be using Warudo instead).
+
 # v1.10.2
 - Re-added `#if VRC_SDK_VRCSDK3` for `using VRC.SDK3.Dynamics.PhysBone.Components;` to prevent breaking the script in non-VRChat projects.
 
