@@ -14,6 +14,28 @@ namespace BluWizard.Hierarchy
         private static readonly Dictionary<Type, Texture2D> s_CustomComponentIcons = new Dictionary<Type, Texture2D>();
         private static Texture2D s_SeparatorTexture;
 
+        private struct IconEntry
+        {
+            public Texture2D dark;
+            public Texture2D light;
+            public bool isUdonSharp;
+            public bool isPhysBoneCollider;
+        }
+
+        private static readonly Dictionary<Type, IconEntry> s_IconByType = new Dictionary<Type, IconEntry>();
+        private static readonly Dictionary<MonoScript, Texture2D> s_UdonSharpIconByScript = new Dictionary<MonoScript, Texture2D>();
+        private static readonly Dictionary<MonoScript, string> s_UdonSharpTooltipByScript = new Dictionary<MonoScript, string>();
+        private static readonly Dictionary<Type, PropertyInfo> s_EnabledPropByType = new Dictionary<Type, PropertyInfo>();
+        private static readonly Dictionary<Type, string> s_NicifiedNameByType = new Dictionary<Type, string>();
+
+        private static bool s_PbcIconsLoaded;
+        private static Texture2D s_PbcPlaneDark, s_PbcPlaneLight, s_PbcSphereDark, s_PbcSphereLight;
+
+        private static readonly List<Component> s_ComponentBuffer = new List<Component>(16);
+        private static readonly GUIContent s_ScratchIconContent = new GUIContent();
+        private static readonly GUIContent s_ScratchNameContent = new GUIContent();
+        private static readonly GUIStyle s_IconOnlyStyle = new GUIStyle { imagePosition = ImagePosition.ImageOnly };
+
         public static void SetCustomIcon(Type componentType, Texture2D icon)
         {
             s_CustomComponentIcons[componentType] = icon;
@@ -25,146 +47,411 @@ namespace BluWizard.Hierarchy
             return icon;
         }
 
-        private static Texture2D ResolveIconForComponent(Component component, bool isDarkTheme, ref string tooltip)
+        private static IconEntry BuildIconEntry(Type t)
         {
-            var t = component.GetType();
+            var entry = new IconEntry();
             string typeName = t.Name;
 
-            // UdonSharp derived classes need special handling for the script icon and tooltip
-            // So, handle UdonSharp (base-type match) first
+            // UdonSharp (base-type match) must be detected first so subclasses route to the MonoScript path.
             if (typeName == "UdonSharpBehaviour" || (t.BaseType != null && t.BaseType.Name == "UdonSharpBehaviour"))
             {
-                Texture2D scriptIcon = null;
-                #if UNITY_EDITOR
-                var mb = component as MonoBehaviour;
-                if (mb != null)
-                {
-                    var monoScript = UnityEditor.MonoScript.FromMonoBehaviour(mb);
-                    if (monoScript != null)
-                    {
-                        var gc = EditorGUIUtility.ObjectContent(monoScript, typeof(UnityEditor.MonoScript));
-                        var candidate = gc.image as Texture2D;
-
-                        if (!EditorUtil.IsDefaultCSharpScriptIcon(candidate)) scriptIcon = candidate;
-
-                        if (Settings.ShowTooltips)
-                        {
-                            var cls = monoScript.GetClass();
-                            string className = cls != null ? cls.Name : monoScript.name;
-                            tooltip = $"Udon Sharp Behaviour ({className})";
-                        }
-                    }
-                }
-                #endif
-                return scriptIcon != null ? scriptIcon : Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
+                entry.isUdonSharp = true;
+                return entry;
             }
 
             switch (typeName)
             {
                 // VRC Avatars SDK
-                case "VRCAvatarDescriptor": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarDescriptor" : "Icons/vrcAvatarDescriptor_L");
-                case "VRCPerPlatformOverrides": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPerPlatformOverrides" : "Icons/vrcPerPlatformOverrides");
-                case "VRCHeadChop": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcHeadChop" : "Icons/vrcHeadChop_L");
-                case "VRCImpostorSettings": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L");
-                case "VRCImpostorEnvironment": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcImpostorSettings" : "Icons/vrcImpostorSettings_L");
-                case "VRCRaycast": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRaycast" : "Icons/vrcRaycast_L");
+                case "VRCAvatarDescriptor":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor_L");
+                    return entry;
+                case "VRCPerPlatformOverrides":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPerPlatformOverrides");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCHeadChop":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcHeadChop");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcHeadChop_L");
+                    return entry;
+                case "VRCImpostorSettings":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcImpostorSettings");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcImpostorSettings_L");
+                    return entry;
+                case "VRCImpostorEnvironment":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcImpostorSettings");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcImpostorSettings_L");
+                    return entry;
+                case "VRCRaycast":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcRaycast");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcRaycast_L");
+                    return entry;
 
                 // VRC Worlds SDK
-                case "VRCSceneDescriptor": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSceneDescriptor" : "Icons/vrcSceneDescriptor_L");
-                case "UdonBehaviour": return Resources.Load<Texture2D>("Icons/vrcUdonBehaviour");
-                case "VRCPickup": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPickup" : "Icons/vrcPickup_L");
-                case "VRCMirrorReflection": return Resources.Load<Texture2D>("Icons/vrcMirrorReflection");
-                case "VRCStation": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcStation" : "Icons/vrcStation_L");
-                case "VRCObjectSync": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcObjectSync" : "Icons/vrcObjectSync_L");
-                case "VRCObjectPool": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcObjectPool" : "Icons/vrcObjectPool_L");
-                case "VRCPortalMarker": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPortalMarker" : "Icons/vrcPortalMarker_L");
-                case "VRCAvatarPedestal": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAvatarPedestal" : "Icons/vrcAvatarPedestal_L");
-                case "VRCAVProVideoPlayer": return Resources.Load<Texture2D>("Icons/vrcAVProVideoPlayer");
-                case "VRCAVProVideoScreen": return Resources.Load<Texture2D>("Icons/vrcAVProVideoScreen");
-                case "VRCAVProVideoSpeaker": return Resources.Load<Texture2D>("Icons/vrcAVProVideoSpeaker");
-                case "VRCUiShape": return Resources.Load<Texture2D>("Icons/vrcUiShape");
-                case "VRCUnityVideoPlayer": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcUnityVideoPlayer" : "Icons/vrcUnityVideoPlayer_L");
-                case "VRCUrlInputField": return Resources.Load<Texture2D>("Icons/vrcURLInputField");
-                case "VRCCameraDollyAnimation": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcCameraDollyAnimation" : "Icons/vrcCameraDollyAnimation_L");
-                case "VRCCameraDollyPath": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcCameraDollyPath" : "Icons/vrcCameraDollyAnimation_L");
-                case "VRCCameraDollyPathPoint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcCameraDollyPoint" : "Icons/vrcCameraDollyPoint_L");
+                case "VRCSceneDescriptor":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor_L");
+                    return entry;
+                case "UdonBehaviour":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcUdonBehaviour");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCPickup":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPickup");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPickup_L");
+                    return entry;
+                case "VRCMirrorReflection":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcMirrorReflection");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCStation":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcStation");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcStation_L");
+                    return entry;
+                case "VRCObjectSync":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcObjectSync");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcObjectSync_L");
+                    return entry;
+                case "VRCObjectPool":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcObjectPool");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcObjectPool_L");
+                    return entry;
+                case "VRCPortalMarker":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPortalMarker");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPortalMarker_L");
+                    return entry;
+                case "VRCAvatarPedestal":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcAvatarPedestal_L");
+                    return entry;
+                case "VRCAVProVideoPlayer":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAVProVideoPlayer");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCAVProVideoScreen":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAVProVideoScreen");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCAVProVideoSpeaker":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAVProVideoSpeaker");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCUiShape":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcUiShape");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCUnityVideoPlayer":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcUnityVideoPlayer");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcUnityVideoPlayer_L");
+                    return entry;
+                case "VRCUrlInputField":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcURLInputField");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCCameraDollyAnimation":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcCameraDollyAnimation");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcCameraDollyAnimation_L");
+                    return entry;
+                case "VRCCameraDollyPath":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcCameraDollyPath");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcCameraDollyAnimation_L");
+                    return entry;
+                case "VRCCameraDollyPathPoint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcCameraDollyPoint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcCameraDollyPoint_L");
+                    return entry;
 
                 // VRC Base SDK
-                case "PipelineManager": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPipelineManager" : "Icons/vrcPipelineManager_L");
-                case "VRCPhysBone": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBone" : "Icons/vrcPhysBone_L");
-                case "VRCPhysBoneRoot": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneRoot" : "Icons/vrcPhysBoneRoot_L");
+                case "PipelineManager":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPipelineManager");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPipelineManager_L");
+                    return entry;
+                case "VRCPhysBone":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPhysBone");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPhysBone_L");
+                    return entry;
+                case "VRCPhysBoneRoot":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPhysBoneRoot");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPhysBoneRoot_L");
+                    return entry;
                 #if VRC_SDK_VRCSDK3
                 case "VRCPhysBoneCollider":
-                {
-                    var physBoneCollider = component as VRCPhysBoneCollider;
-                    if (physBoneCollider != null)
-                    {
-                        switch (physBoneCollider.shapeType)
-                        {
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Plane: return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneColliderPlane" : "Icons/vrcPhysBoneColliderPlane_L");
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Sphere: return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
-                            case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Capsule: return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
-                        }
-                    }
-                    break;
-                }
+                    entry.isPhysBoneCollider = true;
+                    return entry;
                 #else
-                case "VRCPhysBoneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPhysBoneCollider" : "Icons/vrcPhysBoneCollider_L");
+                case "VRCPhysBoneCollider":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider_L");
+                    return entry;
                 #endif
-                case "VRCContactReceiver": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactReceiver" : "Icons/vrcContactReceiver_L");
-                case "VRCContactSender": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcContactSender" : "Icons/vrcContactSender_L");
-                case "VRCParentConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcParentConstraint" : "Icons/vrcParentConstraint_L");
-                case "VRCPositionConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcPositionConstraint" : "Icons/vrcPositionConstraint_L");
-                case "VRCRotationConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcRotationConstraint" : "Icons/vrcRotationConstraint_L");
-                case "VRCScaleConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcScaleConstraint" : "Icons/vrcScaleConstraint_L");
-                case "VRCAimConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcAimConstraint" : "Icons/vrcAimConstraint_L");
-                case "VRCLookAtConstraint": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcLookAtConstraint" : "Icons/vrcLookAtConstraint_L");
-                case "VRCSpatialAudioSource": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrcSpatialAudioSource" : "Icons/vrcSpatialAudioSource_L");
+                case "VRCContactReceiver":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcContactReceiver");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcContactReceiver_L");
+                    return entry;
+                case "VRCContactSender":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcContactSender");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcContactSender_L");
+                    return entry;
+                case "VRCParentConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcParentConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcParentConstraint_L");
+                    return entry;
+                case "VRCPositionConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPositionConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPositionConstraint_L");
+                    return entry;
+                case "VRCRotationConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcRotationConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcRotationConstraint_L");
+                    return entry;
+                case "VRCScaleConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcScaleConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcScaleConstraint_L");
+                    return entry;
+                case "VRCAimConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcAimConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcAimConstraint_L");
+                    return entry;
+                case "VRCLookAtConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcLookAtConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcLookAtConstraint_L");
+                    return entry;
+                case "VRCSpatialAudioSource":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource_L");
+                    return entry;
 
                 // Third-Party Utilities
-                case "VRCFury": return Resources.Load<Texture2D>("Icons/VRCFury");
-                case "VRCFuryComponent": return Resources.Load<Texture2D>("Icons/VRCFury");
-                case "VRCFuryGlobalCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryGlobalCollider" : "Icons/VRCFuryGlobalCollider_L");
-                case "VRCFuryHapticPlug": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFurySPSPlug" : "Icons/VRCFurySPSPlug_L");
-                case "VRCFuryHapticSocket": return Resources.Load<Texture2D>("Icons/VRCFurySPSSocket");
-                case "VRCFuryHapticTouchReceiver": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticReceiver" : "Icons/VRCFuryHapticReceiver_L");
-                case "VRCFuryHapticTouchSender": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/VRCFuryHapticSender" : "Icons/VRCFuryHapticSender_L");
-                case "VRCFuryDebugInfo": return Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");
-                case "VRCFuryTest": return Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");
+                case "VRCFury":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFury");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCFuryComponent":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFury");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCFuryGlobalCollider":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryGlobalCollider");
+                    entry.light = Resources.Load<Texture2D>("Icons/VRCFuryGlobalCollider_L");
+                    return entry;
+                case "VRCFuryHapticPlug":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFurySPSPlug");
+                    entry.light = Resources.Load<Texture2D>("Icons/VRCFurySPSPlug_L");
+                    return entry;
+                case "VRCFuryHapticSocket":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFurySPSSocket");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCFuryHapticTouchReceiver":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryHapticReceiver");
+                    entry.light = Resources.Load<Texture2D>("Icons/VRCFuryHapticReceiver_L");
+                    return entry;
+                case "VRCFuryHapticTouchSender":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryHapticSender");
+                    entry.light = Resources.Load<Texture2D>("Icons/VRCFuryHapticSender_L");
+                    return entry;
+                case "VRCFuryDebugInfo":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "VRCFuryTest":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");
+                    entry.light = entry.dark;
+                    return entry;
 
-                case "BakeryPointLight": return Resources.Load<Texture2D>("Icons/bakeryPointLight");
-                case "BakeryLightMesh": return Resources.Load<Texture2D>("Icons/bakeryLightMesh");
-                case "BakeryDirectLight": return Resources.Load<Texture2D>("Icons/bakeryDirectLight");
-                case "BakerySkyLight": return Resources.Load<Texture2D>("Icons/bakeryDirectLight");
-                case "BakeryLightmapGroupSelector": return Resources.Load<Texture2D>("Icons/bakeryGeneric");
-                case "BakeryLightmappedPrefab": return Resources.Load<Texture2D>("Icons/bakeryGeneric");
-                case "BakeryPackAsSingleSquare": return Resources.Load<Texture2D>("Icons/bakeryGeneric");
-                case "BakerySector": return Resources.Load<Texture2D>("Icons/bakeryGeneric");
-                case "BakeryVolume": return Resources.Load<Texture2D>("Icons/bakeryVolume");
-                case "ftLightmapsStorage": return Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                case "BakeryPointLight":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryPointLight");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryLightMesh":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryLightMesh");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryDirectLight":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryDirectLight");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakerySkyLight":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryDirectLight");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryLightmapGroupSelector":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryLightmappedPrefab":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryPackAsSingleSquare":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakerySector":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BakeryVolume":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryVolume");
+                    entry.light = entry.dark;
+                    return entry;
+                case "ftLightmapsStorage":
+                    entry.dark = Resources.Load<Texture2D>("Icons/bakeryGeneric");
+                    entry.light = entry.dark;
+                    return entry;
 
-                case "d4rkAvatarOptimizer": return Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer");
+                case "d4rkAvatarOptimizer":
+                    entry.dark = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer");
+                    entry.light = entry.dark;
+                    return entry;
 
-                case "GestureManager": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/gestureManager" : "Icons/gestureManager_L");
+                case "GestureManager":
+                    entry.dark = Resources.Load<Texture2D>("Icons/gestureManager");
+                    entry.light = Resources.Load<Texture2D>("Icons/gestureManager_L");
+                    return entry;
 
                 // Other Component Types
-                case "VRMMeta": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmMeta" : "Icons/vrmMeta_L");
-                case "VRMBlendShapeProxy": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmBlendShapeProxy" : "Icons/vrmBlendShapeProxy_L");
-                case "VRMSpringBone": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmSpringBone" : "Icons/vrmSpringBone_L");
-                case "VRMSpringBoneColliderGroup": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/vrmSpringBoneColliderGroup" : "Icons/vrmSpringBoneColliderGroup_L");
-                
-                case "DynamicBone": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBone" : "Icons/dynamicBone_L");
-                case "DynamicBoneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBoneCollider" : "Icons/dynamicBoneCollider_L");
-                case "DynamicBoneColliderBase": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBoneCollider" : "Icons/dynamicBoneCollider_L");
-                case "DynamicBonePlaneCollider": return Resources.Load<Texture2D>(isDarkTheme ? "Icons/dynamicBonePlaneCollider" : "Icons/dynamicBonePlaneCollider_L");
+                case "VRMMeta":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrmMeta");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrmMeta_L");
+                    return entry;
+                case "VRMBlendShapeProxy":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrmBlendShapeProxy");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrmBlendShapeProxy_L");
+                    return entry;
+                case "VRMSpringBone":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrmSpringBone");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrmSpringBone_L");
+                    return entry;
+                case "VRMSpringBoneColliderGroup":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrmSpringBoneColliderGroup");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrmSpringBoneColliderGroup_L");
+                    return entry;
+
+                case "DynamicBone":
+                    entry.dark = Resources.Load<Texture2D>("Icons/dynamicBone");
+                    entry.light = Resources.Load<Texture2D>("Icons/dynamicBone_L");
+                    return entry;
+                case "DynamicBoneCollider":
+                    entry.dark = Resources.Load<Texture2D>("Icons/dynamicBoneCollider");
+                    entry.light = Resources.Load<Texture2D>("Icons/dynamicBoneCollider_L");
+                    return entry;
+                case "DynamicBoneColliderBase":
+                    entry.dark = Resources.Load<Texture2D>("Icons/dynamicBoneCollider");
+                    entry.light = Resources.Load<Texture2D>("Icons/dynamicBoneCollider_L");
+                    return entry;
+                case "DynamicBonePlaneCollider":
+                    entry.dark = Resources.Load<Texture2D>("Icons/dynamicBonePlaneCollider");
+                    entry.light = Resources.Load<Texture2D>("Icons/dynamicBonePlaneCollider_L");
+                    return entry;
             }
 
-            // Custom-per-type override, then Unity fallback
+            return entry;
+        }
+
+        private static IconEntry GetIconEntry(Type t)
+        {
+            if (s_IconByType.TryGetValue(t, out var entry)) return entry;
+            entry = BuildIconEntry(t);
+            s_IconByType[t] = entry;
+            return entry;
+        }
+
+        private static void EnsurePhysBoneColliderIcons()
+        {
+            if (s_PbcIconsLoaded) return;
+            s_PbcPlaneDark = Resources.Load<Texture2D>("Icons/vrcPhysBoneColliderPlane");
+            s_PbcPlaneLight = Resources.Load<Texture2D>("Icons/vrcPhysBoneColliderPlane_L");
+            s_PbcSphereDark = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider");
+            s_PbcSphereLight = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider_L");
+            s_PbcIconsLoaded = true;
+        }
+
+        private static Texture2D ResolveUdonSharpIcon(MonoBehaviour mb, bool showTooltip, ref string tooltip)
+        {
+            var monoScript = MonoScript.FromMonoBehaviour(mb);
+            if (monoScript == null) return Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
+
+            if (!s_UdonSharpIconByScript.TryGetValue(monoScript, out var icon))
+            {
+                var gc = EditorGUIUtility.ObjectContent(monoScript, typeof(MonoScript));
+                var candidate = gc.image as Texture2D;
+                icon = EditorUtil.IsDefaultCSharpScriptIcon(candidate) ? null : candidate;
+                s_UdonSharpIconByScript[monoScript] = icon;
+            }
+
+            if (showTooltip)
+            {
+                if (!s_UdonSharpTooltipByScript.TryGetValue(monoScript, out var tip))
+                {
+                    var cls = monoScript.GetClass();
+                    string className = cls != null ? cls.Name : monoScript.name;
+                    tip = $"Udon Sharp Behaviour ({className})";
+                    s_UdonSharpTooltipByScript[monoScript] = tip;
+                }
+                tooltip = tip;
+            }
+
+            return icon != null ? icon : Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
+        }
+
+        private static Texture2D ResolveIconForComponent(Component component, Type t, bool isDarkTheme, ref string tooltip)
+        {
+            var entry = GetIconEntry(t);
+
+            if (entry.isUdonSharp)
+            {
+                var mb = component as MonoBehaviour;
+                if (mb != null) return ResolveUdonSharpIcon(mb, Settings.ShowTooltips, ref tooltip);
+                return Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
+            }
+
+            if (entry.isPhysBoneCollider)
+            {
+            #if VRC_SDK_VRCSDK3
+                EnsurePhysBoneColliderIcons();
+                var physBoneCollider = component as VRCPhysBoneCollider;
+                if (physBoneCollider != null)
+                {
+                    switch (physBoneCollider.shapeType)
+                    {
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Plane:
+                            return isDarkTheme ? s_PbcPlaneDark : s_PbcPlaneLight;
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Sphere:
+                        case VRC.Dynamics.VRCPhysBoneColliderBase.ShapeType.Capsule:
+                            return isDarkTheme ? s_PbcSphereDark : s_PbcSphereLight;
+                    }
+                }
+            #endif
+            }
+
+            if (entry.dark != null || entry.light != null)
+            {
+                return isDarkTheme ? entry.dark : entry.light;
+            }
+
             var custom = GetCustomIcon(t);
             if (custom != null) return custom;
 
             var iconContent = EditorGUIUtility.ObjectContent(component, t);
             return iconContent.image as Texture2D;
+        }
+
+        private static PropertyInfo GetEnabledProperty(Type t)
+        {
+            if (s_EnabledPropByType.TryGetValue(t, out var prop)) return prop;
+            prop = t.GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
+            if (prop != null && prop.PropertyType != typeof(bool)) prop = null;
+            s_EnabledPropByType[t] = prop;
+            return prop;
+        }
+
+        private static string GetNicifiedTypeName(Type t)
+        {
+            if (s_NicifiedNameByType.TryGetValue(t, out var name)) return name;
+            name = ObjectNames.NicifyVariableName(t.Name);
+            s_NicifiedNameByType[t] = name;
+            return name;
         }
 
         private static Texture2D GetSeparatorTexture()
@@ -207,18 +494,18 @@ namespace BluWizard.Hierarchy
             }
 
             // ---------- COMPONENT ICON PROCESS ----------
-            Component[] components = go.GetComponents<Component>();
-
             GUIStyle labelStyle = EditorStyles.label;
-            float nameWidth = labelStyle.CalcSize(new GUIContent(go.name)).x;
+            s_ScratchNameContent.text = go.name;
+            float nameWidth = labelStyle.CalcSize(s_ScratchNameContent).x;
             float minX = selectionRect.x + nameWidth + 8f;
             float fadeThreshold = minX + 16f;
 
             // Control Missing Scripts Process
-            int missingCount = 0;
+            int missingCount;
             #if UNITY_2019_2_OR_NEWER
             missingCount = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(go);
             #else
+            missingCount = 0;
             var mbs = go.GetComponents<MonoBehaviour>();
             for (int i = 0; i < mbs.Length; i++)
             {
@@ -236,11 +523,12 @@ namespace BluWizard.Hierarchy
                     float alpha = 1f;
                     if (currentX < fadeThreshold) alpha = Mathf.InverseLerp(minX, fadeThreshold, currentX);
 
-                    GUIContent content = new GUIContent(warn.image, $"Missing Script(s): {missingCount}");
+                    s_ScratchIconContent.image = warn.image;
+                    s_ScratchIconContent.tooltip = $"Missing Script(s): {missingCount}";
 
                     Color prev = GUI.color;
                     GUI.color = new Color(prev.r, prev.g, prev.b, alpha);
-                    GUI.Label(missRect, content);
+                    GUI.Label(missRect, s_ScratchIconContent);
                     GUI.color = prev;
                     currentX -= iconSize + 2;
                 }
@@ -249,16 +537,26 @@ namespace BluWizard.Hierarchy
             // If we're not drawing icons now, skip component icons but keep missing script icon above.
             if (!drawIconsNow) return;
 
-            foreach (Component component in components)
+            // Early exit the entire draw in play mode when icons are disabled
+            if (EditorApplication.isPlaying && !Settings.ShowIconsInPlayMode) return;
+
+            bool isDarkTheme = EditorGUIUtility.isProSkin;
+            bool showTooltips = Settings.ShowTooltips;
+            bool showHidden = Settings.ShowHiddenComponents;
+            bool showTransform = Settings.ShowTransformIcon;
+
+            go.GetComponents(s_ComponentBuffer);
+            int count = s_ComponentBuffer.Count;
+
+            for (int ci = 0; ci < count; ci++)
             {
-                // Early exit the entire draw in play mode when icons are disabled
-                if (EditorApplication.isPlaying && !Settings.ShowIconsInPlayMode) return;
+                Component component = s_ComponentBuffer[ci];
 
                 if (component == null) continue;
 
-                if (!Settings.ShowHiddenComponents && (component.hideFlags & HideFlags.HideInInspector) != 0) continue;
+                if (!showHidden && (component.hideFlags & HideFlags.HideInInspector) != 0) continue;
 
-                if (component is Transform && !Settings.ShowTransformIcon) continue;
+                if (component is Transform && !showTransform) continue;
 
                 // Fade Out & Skip Icon if overlapping name
                 if (currentX < minX) break;
@@ -266,15 +564,15 @@ namespace BluWizard.Hierarchy
                 float alpha = 1f;
                 if (currentX < fadeThreshold) alpha = Mathf.InverseLerp(minX, fadeThreshold, currentX);
 
-                bool isDarkTheme = EditorGUIUtility.isProSkin;
-                string tooltip = Settings.ShowTooltips ? ObjectNames.NicifyVariableName(component.GetType().Name) : null;
+                Type componentType = component.GetType();
+                string tooltip = showTooltips ? GetNicifiedTypeName(componentType) : null;
 
                 // Fetch Helper and resolve Component Icons
-                Texture2D icon = ResolveIconForComponent(component, isDarkTheme, ref tooltip);
+                Texture2D icon = ResolveIconForComponent(component, componentType, isDarkTheme, ref tooltip);
 
                 if (icon == null)
                 {
-                    GUIContent iconContent = EditorGUIUtility.ObjectContent(component, component.GetType());
+                    GUIContent iconContent = EditorGUIUtility.ObjectContent(component, componentType);
                     icon = iconContent.image as Texture2D;
                 }
 
@@ -296,8 +594,8 @@ namespace BluWizard.Hierarchy
                 }
                 else
                 {
-                    var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
-                    if (enabledProp != null && enabledProp.PropertyType == typeof(bool))
+                    var enabledProp = GetEnabledProperty(componentType);
+                    if (enabledProp != null)
                     {
                         isEnabled = (bool)enabledProp.GetValue(component, null);
                         canToggle = true;
@@ -325,36 +623,39 @@ namespace BluWizard.Hierarchy
                 Color prevColor = GUI.color;
                 GUI.color = new Color(prevColor.r, prevColor.g, prevColor.b, finalAlpha);
 
-                GUIContent iconContentWithTooltip = new GUIContent(icon, tooltip);
+                s_ScratchIconContent.image = icon;
+                s_ScratchIconContent.tooltip = tooltip;
 
                 if (canToggle)
                 {
-                    if (GUI.Button(iconRect, iconContentWithTooltip, GUIStyle.none))
+                    if (GUI.Button(iconRect, s_ScratchIconContent, GUIStyle.none))
                     {
                         Undo.RecordObject(component, "Toggle Component");
                         bool newEnabled = !isEnabled;
 
-                        if (component is Behaviour) ((Behaviour)component).enabled = newEnabled;
-                        else if (component is Renderer) ((Renderer)component).enabled = newEnabled;
+                        if (component is Behaviour bh) bh.enabled = newEnabled;
+                        else if (component is Renderer rn) rn.enabled = newEnabled;
                         else
                         {
-                            var enabledProp = component.GetType().GetProperty("enabled", BindingFlags.Instance | BindingFlags.Public);
-                            if (enabledProp != null && enabledProp.PropertyType == typeof(bool)) enabledProp.SetValue(component, newEnabled, null);
+                            var enabledProp = GetEnabledProperty(componentType);
+                            if (enabledProp != null) enabledProp.SetValue(component, newEnabled, null);
                         }
 
                         EditorUtility.SetDirty(component);
                     }
                 }
-                else GUI.Label(iconRect, new GUIContent(icon, tooltip), new GUIStyle()
+                else
                 {
-                    imagePosition = ImagePosition.ImageOnly
-                });
+                    GUI.Label(iconRect, s_ScratchIconContent, s_IconOnlyStyle);
+                }
 
                 GUI.color = prevColor;
 
                 // Adjust currentX for next icon
                 currentX -= iconSize + 2;
             }
+
+            s_ComponentBuffer.Clear();
         }
     }
 }
