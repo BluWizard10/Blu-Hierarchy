@@ -1,3 +1,6 @@
+# v1.10.4
+- Optimized the drawing of Component Icons to save on performance. Should be very minimal RAM cost.
+
 # v1.10.3
 - Added Icons for VRM users (but really, you should be using Warudo instead).
 
