@@ -2,6 +2,9 @@ name: Build Release
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 env:
   packageName: "net.bluwizard.hierarchy"
@@ -22,6 +25,18 @@ jobs:
         with:
           path: "package.json"
           prop_path: "version"
+
+      - name: Verify tag matches package.json version
+        if: github.ref_type == 'tag'
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${{ steps.version.outputs.prop }}"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::Pushed tag '$TAG' does not match package.json version '$VERSION'."
+            echo "::error::Bump package.json first, commit, then tag."
+            exit 1
+          fi
+          echo "Tag and package.json version match: $VERSION"
 
       - name: Set Environment Variables
         run: |
@@ -53,3 +68,11 @@ jobs:
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
             package.json
+
+      - name: Trigger VPM Listing Rebuild
+        env:
+          GH_TOKEN: ${{ secrets.VPM_DISPATCH_TOKEN }}
+        run: |
+          gh workflow run build-listing.yml \
+            --repo BluWizard10/VPM \
+            --ref main
