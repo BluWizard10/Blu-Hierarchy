@@ -309,6 +309,31 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/gestureManager");
                     entry.light = Resources.Load<Texture2D>("Icons/gestureManager_L");
                     return entry;
+                
+                case "FaceEmoLauncherComponent":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
+                case "BlinkDisabler":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
+                case "TrackingControlDisabler":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
+                case "MenuRepositoryComponent":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
+                case "MenuRepositoryTestComponent":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
+                case "RestorationCheckpoint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
+                    entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
+                    return entry;
 
                 // Other Component Types
                 case "VRMMeta":

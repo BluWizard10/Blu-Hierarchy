@@ -1,3 +1,6 @@
+# v1.10.6
+- Added Icon for FaceEmo components.
+
 # v1.10.5
 - Fixed a bug where non-visible Sub Scenes show Scene Header buttons when only one is visible.
   - *NDMF users rejoice!*
