@@ -75,7 +75,7 @@ namespace BluWizard.Hierarchy
                 string loadLabel = isLoaded ? "Unload Scene" : "Load Scene";
 
                 // Load/Unload Boolean
-                bool canToggleLoad = (isLoaded && EditorSceneManager.sceneCount > 1) || (!isLoaded);
+                bool canToggleLoad = (isLoaded && CountVisibleScenes() > 1) || (!isLoaded);
 
                 using (new EditorGUI.DisabledScope(!canToggleLoad))
                 {
@@ -113,15 +113,22 @@ namespace BluWizard.Hierarchy
         private static bool ShouldShowSceneHeaderButtons()
         {
             if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode) return false;
-            
-            try
+            return CountVisibleScenes() > 1;
+        }
+
+        // Count Visible Scenes instead of Active Scenes because apparently NDMF creates a hidden Scene in the background due to the way Unity functions.
+        private static int CountVisibleScenes()
+        {
+            int count = 0;
+            int total = EditorSceneManager.sceneCount;
+            for (int i = 0; i < total; i++)
             {
-                return EditorSceneManager.GetSceneManagerSetup().Length > 1;
+                Scene s = EditorSceneManager.GetSceneAt(i);
+                if (!s.IsValid()) continue;
+                if (s.isSubScene) continue;
+                count++;
             }
-            catch (InvalidOperationException)
-            {
-                return EditorSceneManager.sceneCount > 1;
-            }
+            return count;
         }
 
         private static bool TryGetLoadedSceneByPath(string scenePath, out Scene scene)

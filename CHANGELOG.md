@@ -1,3 +1,7 @@
+# v1.10.5
+- Fixed a bug where non-visible Sub Scenes show Scene Header buttons when only one is visible.
+  - *NDMF users rejoice!*
+
 # v1.10.4
 - Optimized the drawing of Component Icons to save on performance. Should be very minimal RAM cost.
 
