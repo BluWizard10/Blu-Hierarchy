@@ -13,6 +13,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.10.4-beta.2",
+            "define": "BLU_VRC_CONTACT_BOX"
+        }
+    ],
     "noEngineReferences": false
 }

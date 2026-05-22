@@ -1,3 +1,10 @@
+# v1.10.7
+- Added Icon for Box shape VRC Contacts, introduced in SDK 3.10.4.
+- Added Version Define to prevent breaking scripts on older SDK versions, due to the introduction of Box shape VRC Contacts.
+- Re-done Layer Icon logic. Somehow it was still not loading the icons in the way I intended in the first place.
+- Replaced all Layer Icons with new ones.
+- Removed Vertical Line that appeared for Layer Icons.
+
 # v1.10.6
 - Added Icon for FaceEmo components.
 

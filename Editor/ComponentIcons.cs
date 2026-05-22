@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 #if VRC_SDK_VRCSDK3 // Prevent breaking script if VRC SDK does not exist in the project.
 using VRC.SDK3.Dynamics.PhysBone.Components;
+using VRC.SDK3.Dynamics.Contact.Components;
 #endif
 
 namespace BluWizard.Hierarchy
@@ -12,7 +13,6 @@ namespace BluWizard.Hierarchy
     internal static class ComponentIcons
     {
         private static readonly Dictionary<Type, Texture2D> s_CustomComponentIcons = new Dictionary<Type, Texture2D>();
-        private static Texture2D s_SeparatorTexture;
 
         private struct IconEntry
         {
@@ -20,6 +20,8 @@ namespace BluWizard.Hierarchy
             public Texture2D light;
             public bool isUdonSharp;
             public bool isPhysBoneCollider;
+            public bool isContactReceiver;
+            public bool isContactSender;
         }
 
         private static readonly Dictionary<Type, IconEntry> s_IconByType = new Dictionary<Type, IconEntry>();
@@ -30,6 +32,10 @@ namespace BluWizard.Hierarchy
 
         private static bool s_PbcIconsLoaded;
         private static Texture2D s_PbcPlaneDark, s_PbcPlaneLight, s_PbcSphereDark, s_PbcSphereLight;
+        private static bool s_CrIconsLoaded;
+        private static Texture2D s_CrSphereDark, s_CrSphereLight, s_CrBoxDark, s_CrBoxLight;
+        private static bool s_CsIconsLoaded;
+        private static Texture2D s_CsSphereDark, s_CsSphereLight, s_CsBoxDark, s_CsBoxLight;
 
         private static readonly List<Component> s_ComponentBuffer = new List<Component>(16);
         private static readonly GUIContent s_ScratchIconContent = new GUIContent();
@@ -174,16 +180,21 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcPhysBoneRoot");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcPhysBoneRoot_L");
                     return entry;
-                #if VRC_SDK_VRCSDK3
+#if VRC_SDK_VRCSDK3
                 case "VRCPhysBoneCollider":
                     entry.isPhysBoneCollider = true;
                     return entry;
-                #else
+                case "VRCContactReceiver":
+                    entry.isContactReceiver = true;
+                    return entry;
+                case "VRCContactSender":
+                    entry.isContactSender = true;
+                    return entry;
+#else
                 case "VRCPhysBoneCollider":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcPhysBoneCollider_L");
                     return entry;
-                #endif
                 case "VRCContactReceiver":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcContactReceiver");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcContactReceiver_L");
@@ -192,6 +203,7 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcContactSender");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcContactSender_L");
                     return entry;
+#endif
                 case "VRCParentConstraint":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcParentConstraint");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcParentConstraint_L");
@@ -392,6 +404,26 @@ namespace BluWizard.Hierarchy
             s_PbcIconsLoaded = true;
         }
 
+        private static void EnsureContactReceiverIcons()
+        {
+            if (s_CrIconsLoaded) return;
+            s_CrSphereDark = Resources.Load<Texture2D>("Icons/vrcContactReceiver");
+            s_CrSphereLight = Resources.Load<Texture2D>("Icons/vrcContactReceiver_L");
+            s_CrBoxDark = Resources.Load<Texture2D>("Icons/vrcContactReceiverBox");
+            s_CrBoxLight = Resources.Load<Texture2D>("Icons/vrcContactReceiverBox_L");
+            s_CrIconsLoaded = true;
+        }
+
+        private static void EnsureContactSenderIcons()
+        {
+            if (s_CsIconsLoaded) return;
+            s_CsSphereDark = Resources.Load<Texture2D>("Icons/vrcContactSender");
+            s_CsSphereLight = Resources.Load<Texture2D>("Icons/vrcContactSender_L");
+            s_CsBoxDark = Resources.Load<Texture2D>("Icons/vrcContactSenderBox");
+            s_CsBoxLight = Resources.Load<Texture2D>("Icons/vrcContactSenderBox_L");
+            s_CsIconsLoaded = true;
+        }
+
         private static Texture2D ResolveUdonSharpIcon(MonoBehaviour mb, bool showTooltip, ref string tooltip)
         {
             var monoScript = MonoScript.FromMonoBehaviour(mb);
@@ -431,9 +463,9 @@ namespace BluWizard.Hierarchy
                 return Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
             }
 
+#if VRC_SDK_VRCSDK3
             if (entry.isPhysBoneCollider)
             {
-            #if VRC_SDK_VRCSDK3
                 EnsurePhysBoneColliderIcons();
                 var physBoneCollider = component as VRCPhysBoneCollider;
                 if (physBoneCollider != null)
@@ -447,8 +479,46 @@ namespace BluWizard.Hierarchy
                             return isDarkTheme ? s_PbcSphereDark : s_PbcSphereLight;
                     }
                 }
-            #endif
             }
+
+            if (entry.isContactReceiver)
+            {
+                EnsureContactReceiverIcons();
+                var contactReceiver = component as VRCContactReceiver;
+                if (contactReceiver != null)
+                {
+                    switch (contactReceiver.shapeType)
+                    {
+                        case VRC.Dynamics.ContactBase.ShapeType.Sphere:
+                        case VRC.Dynamics.ContactBase.ShapeType.Capsule:
+                            return isDarkTheme ? s_CrSphereDark : s_CrSphereLight;
+#if BLU_VRC_CONTACT_BOX
+                        case VRC.Dynamics.ContactBase.ShapeType.Box:
+                            return isDarkTheme ? s_CrBoxDark : s_CrBoxLight;
+#endif
+                    }
+                }
+            }
+
+            if (entry.isContactSender)
+            {
+                EnsureContactSenderIcons();
+                var contactSender = component as VRCContactSender;
+                if (contactSender != null)
+                {
+                    switch (contactSender.shapeType)
+                    {
+                        case VRC.Dynamics.ContactBase.ShapeType.Sphere:
+                        case VRC.Dynamics.ContactBase.ShapeType.Capsule:
+                            return isDarkTheme ? s_CsSphereDark : s_CsSphereLight;
+#if BLU_VRC_CONTACT_BOX
+                        case VRC.Dynamics.ContactBase.ShapeType.Box:
+                            return isDarkTheme ? s_CsBoxDark : s_CsBoxLight;
+#endif
+                    }
+                }
+            }
+#endif
 
             if (entry.dark != null || entry.light != null)
             {
@@ -479,21 +549,11 @@ namespace BluWizard.Hierarchy
             return name;
         }
 
-        private static Texture2D GetSeparatorTexture()
-        {
-            if (s_SeparatorTexture != null) return s_SeparatorTexture;
-
-            s_SeparatorTexture = new Texture2D(1, 1);
-            s_SeparatorTexture.SetPixel(0, 0, Color.gray);
-            s_SeparatorTexture.Apply();
-            s_SeparatorTexture.hideFlags = HideFlags.HideAndDontSave;
-            return s_SeparatorTexture;
-        }
-
         public static void Draw(GameObject go, Rect selectionRect, float toggleOffset, bool drawIconsNow)
         {
             float iconSize = 16f;
             float currentX = selectionRect.xMax - iconSize - toggleOffset;
+            bool isDarkTheme = EditorGUIUtility.isProSkin;
 
             // ---------- LAYER ICON PROCESS ----------
             if (Settings.ShowLayerIcon && drawIconsNow)
@@ -502,18 +562,12 @@ namespace BluWizard.Hierarchy
                 {
                     string layerName = LayerMask.LayerToName(go.layer);
 
-                    if (Icons.TryGetLayerIcon(layerName, out Texture2D layerIcon) && layerIcon != null)
+                    if (Icons.TryGetLayerIcon(layerName, isDarkTheme, out Texture2D layerIcon) && layerIcon != null)
                     {
                         Rect layerIconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
                         GUI.DrawTexture(layerIconRect, layerIcon);
 
                         currentX -= iconSize + 2;
-
-                        float separatorWidth = 1f;
-                        Rect separatorRect = new Rect(currentX, selectionRect.y, separatorWidth, selectionRect.height);
-                        GUI.DrawTexture(separatorRect, GetSeparatorTexture());
-
-                        currentX -= separatorWidth + 2;
                     }
                 }
             }
@@ -527,16 +581,16 @@ namespace BluWizard.Hierarchy
 
             // Control Missing Scripts Process
             int missingCount;
-            #if UNITY_2019_2_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
             missingCount = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(go);
-            #else
+#else
             missingCount = 0;
             var mbs = go.GetComponents<MonoBehaviour>();
             for (int i = 0; i < mbs.Length; i++)
             {
                 if (mbs[i] == null) missingCount++;
             }
-            #endif
+#endif
 
             if (missingCount > 0)
             {
@@ -565,7 +619,6 @@ namespace BluWizard.Hierarchy
             // Early exit the entire draw in play mode when icons are disabled
             if (EditorApplication.isPlaying && !Settings.ShowIconsInPlayMode) return;
 
-            bool isDarkTheme = EditorGUIUtility.isProSkin;
             bool showTooltips = Settings.ShowTooltips;
             bool showHidden = Settings.ShowHiddenComponents;
             bool showTransform = Settings.ShowTransformIcon;

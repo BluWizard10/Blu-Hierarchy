@@ -6,11 +6,28 @@ namespace BluWizard.Hierarchy
 {
     internal static class Icons
     {
+        private struct LayerIconEntry
+        {
+            public Texture2D dark;
+            public Texture2D light;
+        }
+
         private static bool s_LayerIconsLoaded;
 
-        private static readonly Dictionary<string, Texture2D> s_LayerIcons = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, LayerIconEntry> s_LayerIcons = new Dictionary<string, LayerIconEntry>();
 
         public static bool ShouldDrawIconsNow => !EditorApplication.isPlaying || Settings.ShowIconsInPlayMode;
+
+        private static void LoadLayerEntry(string layerName, string baseIcon)
+        {
+            var dark = Resources.Load<Texture2D>("Icons/" + baseIcon);
+            var light = Resources.Load<Texture2D>("Icons/" + baseIcon + "_L");
+            s_LayerIcons[layerName] = new LayerIconEntry
+            {
+                dark = dark,
+                light = light != null ? light : dark,
+            };
+        }
 
         public static void EnsureLayerIconsLoaded()
         {
@@ -19,41 +36,47 @@ namespace BluWizard.Hierarchy
             // Check if Unity is in Play Mode && Settings.ShowIconsInPlayMode is disabled
             if (EditorApplication.isPlaying && !Settings.ShowIconsInPlayMode) return;
 
-            s_LayerIcons["TransparentFX"] = Resources.Load<Texture2D>("Icons/L_TransparentFX");
-            s_LayerIcons["Ignore Raycast"] = Resources.Load<Texture2D>("Icons/L_IgnoreRaycast");
-            s_LayerIcons["reserved3"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["Item"] = Resources.Load<Texture2D>("Icons/L_Item");
-            s_LayerIcons["Water"] = Resources.Load<Texture2D>("Icons/L_Water");
-            s_LayerIcons["UI"] = Resources.Load<Texture2D>("Icons/L_UI");
-            s_LayerIcons["reserved6"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["reserved7"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["Interactive"] = Resources.Load<Texture2D>("Icons/L_Interactive");
-            s_LayerIcons["Player"] = Resources.Load<Texture2D>("Icons/L_Player");
-            s_LayerIcons["PlayerLocal"] = Resources.Load<Texture2D>("Icons/L_PlayerLocal");
-            s_LayerIcons["Environment"] = Resources.Load<Texture2D>("Icons/L_Environment");
-            s_LayerIcons["UiMenu"] = Resources.Load<Texture2D>("Icons/L_UiMenu");
-            s_LayerIcons["Pickup"] = Resources.Load<Texture2D>("Icons/L_Pickup");
-            s_LayerIcons["PickupNoEnvironment"] = Resources.Load<Texture2D>("Icons/L_Pickup");
-            s_LayerIcons["StereoLeft"] = Resources.Load<Texture2D>("Icons/L_Stereo");
-            s_LayerIcons["StereoRight"] = Resources.Load<Texture2D>("Icons/L_Stereo");
-            s_LayerIcons["Walkthrough"] = Resources.Load<Texture2D>("Icons/L_Walkthrough");
-            s_LayerIcons["MirrorReflection"] = Resources.Load<Texture2D>("Icons/L_MirrorReflection");
-            s_LayerIcons["InternalUI"] = Resources.Load<Texture2D>("Icons/L_InternalUI");
-            s_LayerIcons["HardwareObjects"] = Resources.Load<Texture2D>("Icons/L_HardwareObjects");
-            s_LayerIcons["reserved2"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["reserved4"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["reserved5"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["reserved8"] = Resources.Load<Texture2D>("Icons/L_Reserved");
-            s_LayerIcons["PostProcessing"] = Resources.Load<Texture2D>("Icons/L_PostProcessing");
-            s_LayerIcons["reserved1"] = Resources.Load<Texture2D>("Icons/L_Reserved");
+            LoadLayerEntry("TransparentFX", "L_TransparentFX");
+            LoadLayerEntry("Ignore Raycast", "L_IgnoreRaycast");
+            LoadLayerEntry("reserved3", "L_Reserved");
+            LoadLayerEntry("Item", "L_Item");
+            LoadLayerEntry("Water", "L_Water");
+            LoadLayerEntry("UI", "L_UI");
+            LoadLayerEntry("reserved6", "L_Reserved");
+            LoadLayerEntry("reserved7", "L_Reserved");
+            LoadLayerEntry("Interactive", "L_Interactive");
+            LoadLayerEntry("Player", "L_Player");
+            LoadLayerEntry("PlayerLocal", "L_PlayerLocal");
+            LoadLayerEntry("Environment", "L_Environment");
+            LoadLayerEntry("UiMenu", "L_UiMenu");
+            LoadLayerEntry("Pickup", "L_Pickup");
+            LoadLayerEntry("PickupNoEnvironment", "L_Pickup");
+            LoadLayerEntry("StereoLeft", "L_StereoL");
+            LoadLayerEntry("StereoRight", "L_StereoR");
+            LoadLayerEntry("Walkthrough", "L_Walkthrough");
+            LoadLayerEntry("MirrorReflection", "L_MirrorReflection");
+            LoadLayerEntry("InternalUI", "L_InternalUI");
+            LoadLayerEntry("HardwareObjects", "L_HardwareObjects");
+            LoadLayerEntry("reserved2", "L_Reserved");
+            LoadLayerEntry("reserved4", "L_Reserved");
+            LoadLayerEntry("reserved5", "L_Reserved");
+            LoadLayerEntry("reserved8", "L_Reserved");
+            LoadLayerEntry("PostProcessing", "L_PostProcessing");
+            LoadLayerEntry("reserved1", "L_Reserved");
 
             s_LayerIconsLoaded = true;
         }
 
-        public static bool TryGetLayerIcon(string layerName, out Texture2D icon)
+        public static bool TryGetLayerIcon(string layerName, bool isDarkTheme, out Texture2D icon)
         {
             EnsureLayerIconsLoaded();
-            return s_LayerIcons.TryGetValue(layerName, out icon);
+            if (s_LayerIcons.TryGetValue(layerName, out var entry))
+            {
+                icon = isDarkTheme ? entry.dark : entry.light;
+                return icon != null;
+            }
+            icon = null;
+            return false;
         }
     }
 }
