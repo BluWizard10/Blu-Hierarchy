@@ -15,8 +15,10 @@ Compared to other systems, this one is intended to match the Editor UI without b
   - Also works when animating!
 - Custom Icons representing known Components from the VRChat SDK, such as Avatar Dynamics, Udon Behaviours, and VRC Constraints!
 - Custom Icons for known third-party Components such as Bakery and VRCFury.
+  - Components can also show their own Icons on the Component via Unity's native `[Icon(...)]` attribute.
 - Tooltips when hovering over icons, telling you what they are at a glance.
 - Alternate Icons with darker color tone if using the Light Theme.
+- Relationship Lines showing an object's connection to it's parent and child objects.
 - Settings Panel located in `Tools -> BluWizard LABS -> Enhanced Hierarchy Settings` to customize how the system should operate. Settings are persistent across Unity Projects.
 
 ## Benefits:
