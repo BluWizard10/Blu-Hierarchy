@@ -12,6 +12,7 @@ namespace BluWizard.Hierarchy
         private const int PRI_GameObjectToggle = 10;
         private const int PRI_TransformIcon = 20;
         private const int PRI_LayerIcons = 30;
+        private const int PRI_RelationshipLines = 35;
         private const int PRI_HiddenComponents = 40;
         private const int PRI_Tooltips = 50;
         private const int PRI_DragToToggle = 60;
@@ -52,6 +53,16 @@ namespace BluWizard.Hierarchy
         private static bool V_ShowLayerIcon()
         {
             Menu.SetChecked(Root + "Show Layer Icons", Settings.ShowLayerIcon);
+            return true;
+        }
+
+        // Relationship Lines Toggle
+        [MenuItem(Root + "Show Relationship Lines", false, PRI_RelationshipLines)]
+        private static void M_ShowRelationshipLines() => Toggle(() => Settings.ShowRelationshipLines, v => Settings.ShowRelationshipLines = v, Root + "Show Relationship Lines");
+        [MenuItem(Root + "Show Relationship Lines", true)]
+        private static bool V_ShowRelationshipLines()
+        {
+            Menu.SetChecked(Root + "Show Relationship Lines", Settings.ShowRelationshipLines);
             return true;
         }
 
@@ -106,6 +117,7 @@ namespace BluWizard.Hierarchy
                 V_ShowGameObjectToggle();
                 V_ShowTransformIcon();
                 V_ShowLayerIcon();
+                V_ShowRelationshipLines();
                 V_ShowHiddenComponents();
                 V_ShowTooltips();
                 V_EnableDragToToggle();

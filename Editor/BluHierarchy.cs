@@ -39,6 +39,9 @@ namespace BluWizard.Hierarchy
                 return;
             }
 
+            // ---------- RELATIONSHIP LINES ----------
+            RelationshipLines.Draw(go, selectionRect);
+
             // ---------- GAME OBJECT TOGGLE ----------
             float toggleOffset = GameObjectToggle.Draw(go, selectionRect);
 
