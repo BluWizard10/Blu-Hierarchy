@@ -5,7 +5,8 @@ namespace BluWizard.Hierarchy
     public static class Settings
     {
         private const string ShowTransformIconKey = "BluHierarchy_ShowTransformIcon";
-        private const string ShowLayerIconKey = "BluHierarchy_ShowLayerIcon";
+        private const string ShowLayerNamesKey = "BluHierarchy_ShowLayerNames";
+        private const string ShowTagNamesKey = "BluHierarchy_ShowTagNames";
         private const string ShowHiddenComponentsKey = "BluHierarchy_ShowHiddenComponents";
         private const string ShowGameObjectToggleKey = "BluHierarchy_ShowGameObjectToggle";
         private const string ShowTooltipsKey = "BluHierarchy_ShowTooltips";
@@ -19,10 +20,16 @@ namespace BluWizard.Hierarchy
             set => EditorPrefs.SetBool(ShowTransformIconKey, value);
         }
 
-        public static bool ShowLayerIcon
+        public static bool ShowLayerNames
         {
-            get => EditorPrefs.GetBool(ShowLayerIconKey, false);
-            set => EditorPrefs.SetBool(ShowLayerIconKey, value);
+            get => EditorPrefs.GetBool(ShowLayerNamesKey, false);
+            set => EditorPrefs.SetBool(ShowLayerNamesKey, value);
+        }
+
+        public static bool ShowTagNames
+        {
+            get => EditorPrefs.GetBool(ShowTagNamesKey, true);
+            set => EditorPrefs.SetBool(ShowTagNamesKey, value);
         }
 
         public static bool ShowGameObjectToggle
@@ -67,7 +74,8 @@ namespace BluWizard.Hierarchy
             {
                 ShowGameObjectToggleKey,
                 ShowTransformIconKey,
-                ShowLayerIconKey,
+                ShowLayerNamesKey,
+                ShowTagNamesKey,
                 ShowHiddenComponentsKey,
                 ShowTooltipsKey,
                 EnableDragToToggleKey,

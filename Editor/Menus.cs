@@ -11,7 +11,8 @@ namespace BluWizard.Hierarchy
         // Explicit priorities on dropdown menu
         private const int PRI_GameObjectToggle = 10;
         private const int PRI_TransformIcon = 20;
-        private const int PRI_LayerIcons = 30;
+        private const int PRI_LayerNames = 30;
+        private const int PRI_TagNames = 32;
         private const int PRI_RelationshipLines = 35;
         private const int PRI_HiddenComponents = 40;
         private const int PRI_Tooltips = 50;
@@ -46,13 +47,23 @@ namespace BluWizard.Hierarchy
             return true;
         }
 
-        // Show Layer Icons
-        [MenuItem(Root + "Show Layer Icons", false, PRI_LayerIcons)]
-        private static void M_ShowLayerIcon() => Toggle(() => Settings.ShowLayerIcon, v => Settings.ShowLayerIcon = v, Root + "Show Layer Icons");
-        [MenuItem(Root + "Show Layer Icons", true)]
-        private static bool V_ShowLayerIcon()
+        // Show Layer Names
+        [MenuItem(Root + "Show Layer Names", false, PRI_LayerNames)]
+        private static void M_ShowLayerNames() => Toggle(() => Settings.ShowLayerNames, v => Settings.ShowLayerNames = v, Root + "Show Layer Names");
+        [MenuItem(Root + "Show Layer Names", true)]
+        private static bool V_ShowLayerNames()
         {
-            Menu.SetChecked(Root + "Show Layer Icons", Settings.ShowLayerIcon);
+            Menu.SetChecked(Root + "Show Layer Names", Settings.ShowLayerNames);
+            return true;
+        }
+
+        // Show Tag Names
+        [MenuItem(Root + "Show Tag Names", false, PRI_TagNames)]
+        private static void M_ShowTagNames() => Toggle(() => Settings.ShowTagNames, v => Settings.ShowTagNames = v, Root + "Show Tag Names");
+        [MenuItem(Root + "Show Tag Names", true)]
+        private static bool V_ShowTagNames()
+        {
+            Menu.SetChecked(Root + "Show Tag Names", Settings.ShowTagNames);
             return true;
         }
 
@@ -116,7 +127,8 @@ namespace BluWizard.Hierarchy
                 // Refresh Checkmarks
                 V_ShowGameObjectToggle();
                 V_ShowTransformIcon();
-                V_ShowLayerIcon();
+                V_ShowLayerNames();
+                V_ShowTagNames();
                 V_ShowRelationshipLines();
                 V_ShowHiddenComponents();
                 V_ShowTooltips();

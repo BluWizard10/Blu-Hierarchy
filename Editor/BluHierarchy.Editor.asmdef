@@ -16,7 +16,7 @@
     "versionDefines": [
         {
             "name": "com.vrchat.base",
-            "expression": "3.10.4-beta.2",
+            "expression": "3.10.4",
             "define": "BLU_VRC_CONTACT_BOX"
         }
     ],

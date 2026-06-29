@@ -41,6 +41,7 @@ namespace BluWizard.Hierarchy
         private static readonly GUIContent s_ScratchIconContent = new GUIContent();
         private static readonly GUIContent s_ScratchNameContent = new GUIContent();
         private static readonly GUIStyle s_IconOnlyStyle = new GUIStyle { imagePosition = ImagePosition.ImageOnly };
+        public static bool ShouldDrawIconsNow => !EditorApplication.isPlaying || Settings.ShowIconsInPlayMode;
 
         public static void SetCustomIcon(Type componentType, Texture2D icon)
         {
@@ -268,6 +269,14 @@ namespace BluWizard.Hierarchy
                     return entry;
                 case "VRCFuryTest":
                     entry.dark = Resources.Load<Texture2D>("Icons/VRCFuryDebugInfo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "UdonDiInjectField":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFury");
+                    entry.light = entry.dark;
+                    return entry;
+                case "UdonDiRegister":
+                    entry.dark = Resources.Load<Texture2D>("Icons/VRCFury");
                     entry.light = entry.dark;
                     return entry;
 
@@ -555,28 +564,15 @@ namespace BluWizard.Hierarchy
             float currentX = selectionRect.xMax - iconSize - toggleOffset;
             bool isDarkTheme = EditorGUIUtility.isProSkin;
 
-            // ---------- LAYER ICON PROCESS ----------
-            if (Settings.ShowLayerIcon && drawIconsNow)
-            {
-                if (!EditorApplication.isPlaying)
-                {
-                    string layerName = LayerMask.LayerToName(go.layer);
-
-                    if (Icons.TryGetLayerIcon(layerName, isDarkTheme, out Texture2D layerIcon) && layerIcon != null)
-                    {
-                        Rect layerIconRect = new Rect(currentX, selectionRect.y, iconSize, iconSize);
-                        GUI.DrawTexture(layerIconRect, layerIcon);
-
-                        currentX -= iconSize + 2;
-                    }
-                }
-            }
+            // ---------- LAYER NAME PROCESS ----------
+            currentX = Layers.Draw(go, selectionRect, currentX, iconSize, isDarkTheme);
 
             // ---------- COMPONENT ICON PROCESS ----------
             GUIStyle labelStyle = EditorStyles.label;
             s_ScratchNameContent.text = go.name;
             float nameWidth = labelStyle.CalcSize(s_ScratchNameContent).x;
             float minX = selectionRect.x + nameWidth + 8f;
+            minX = Tags.GetFadeBoundary(go, selectionRect, nameWidth, minX);
             float fadeThreshold = minX + 16f;
 
             // Control Missing Scripts Process
