@@ -1,3 +1,7 @@
+# [1.12.1]
+- Fixed support for Unity 6.3 and newer.
+- Added Icons for Resonite SDK components.
+
 # [1.12.0]
 - **Added Rounded Rectangle renderer for Tags and Layers**
   - This is a fancy pill-shaped rectangle with rounded corners that is used for the Tags and Layers appearance in the Hierarchy. They are colored based on relevance in the SDK and use neutral colorings for all other Tags and/or Layers.
