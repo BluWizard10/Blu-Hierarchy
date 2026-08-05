@@ -68,7 +68,9 @@ namespace BluWizard.Hierarchy
 
             switch (typeName)
             {
-                // VRC Avatars SDK
+                /// <summary>
+                /// VRChat Avatars SDK
+                /// </summary>
                 case "VRCAvatarDescriptor":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcAvatarDescriptor_L");
@@ -94,7 +96,9 @@ namespace BluWizard.Hierarchy
                     entry.light = Resources.Load<Texture2D>("Icons/vrcRaycast_L");
                     return entry;
 
-                // VRC Worlds SDK
+                /// <summary>
+                /// VRChat Worlds SDK
+                /// </summary>
                 case "VRCSceneDescriptor":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcSceneDescriptor_L");
@@ -168,7 +172,9 @@ namespace BluWizard.Hierarchy
                     entry.light = Resources.Load<Texture2D>("Icons/vrcCameraDollyPoint_L");
                     return entry;
 
-                // VRC Base SDK
+                /// <summary>
+                /// VRChat Base SDK
+                /// </summary>
                 case "PipelineManager":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcPipelineManager");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcPipelineManager_L");
@@ -234,7 +240,11 @@ namespace BluWizard.Hierarchy
                     entry.light = Resources.Load<Texture2D>("Icons/vrcSpatialAudioSource_L");
                     return entry;
 
-                // Third-Party Utilities
+                /// <summary>
+                /// Third-Party Utilities
+                /// </summary>
+                
+                // VRCFury
                 case "VRCFury":
                     entry.dark = Resources.Load<Texture2D>("Icons/VRCFury");
                     entry.light = entry.dark;
@@ -280,6 +290,7 @@ namespace BluWizard.Hierarchy
                     entry.light = entry.dark;
                     return entry;
 
+                // Bakery
                 case "BakeryPointLight":
                     entry.dark = Resources.Load<Texture2D>("Icons/bakeryPointLight");
                     entry.light = entry.dark;
@@ -321,16 +332,19 @@ namespace BluWizard.Hierarchy
                     entry.light = entry.dark;
                     return entry;
 
+                // d4rk Optimizer
                 case "d4rkAvatarOptimizer":
                     entry.dark = Resources.Load<Texture2D>("Icons/d4rkAvatarOptimizer");
                     entry.light = entry.dark;
                     return entry;
 
+                // Gesture Manager
                 case "GestureManager":
                     entry.dark = Resources.Load<Texture2D>("Icons/gestureManager");
                     entry.light = Resources.Load<Texture2D>("Icons/gestureManager_L");
                     return entry;
                 
+                // FaceEmo
                 case "FaceEmoLauncherComponent":
                     entry.dark = Resources.Load<Texture2D>("Icons/FaceEmo");
                     entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
@@ -356,7 +370,11 @@ namespace BluWizard.Hierarchy
                     entry.light = Resources.Load<Texture2D>("Icons/FaceEmo_L");
                     return entry;
 
-                // Other Component Types
+                /// <summary>
+                /// Other Component Types
+                /// </summary>
+                
+                // VRM
                 case "VRMMeta":
                     entry.dark = Resources.Load<Texture2D>("Icons/vrmMeta");
                     entry.light = Resources.Load<Texture2D>("Icons/vrmMeta_L");
@@ -374,6 +392,7 @@ namespace BluWizard.Hierarchy
                     entry.light = Resources.Load<Texture2D>("Icons/vrmSpringBoneColliderGroup_L");
                     return entry;
 
+                // The infamous AWFUL-performing Dynamic Bone
                 case "DynamicBone":
                     entry.dark = Resources.Load<Texture2D>("Icons/dynamicBone");
                     entry.light = Resources.Load<Texture2D>("Icons/dynamicBone_L");
@@ -389,6 +408,104 @@ namespace BluWizard.Hierarchy
                 case "DynamicBonePlaneCollider":
                     entry.dark = Resources.Load<Texture2D>("Icons/dynamicBonePlaneCollider");
                     entry.light = Resources.Load<Texture2D>("Icons/dynamicBonePlaneCollider_L");
+                    return entry;
+                
+                // Known Resonite Components
+                case "ResoniteBipedAvatarDescriptor":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "AvatarSetupTracker":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "AudioSourceConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "BoxColliderConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "CapsuleColliderConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "MeshColliderConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "SphereColliderConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "AnimatorConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "LightConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "MeshRendererConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "ParticleSystemConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "ReflectionProbeConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "SkinnedMeshRendererConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "TextRendererConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "PoiyomiConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "MToonConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "TestInvertConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "TestPanningConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "StandardConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "StandardSpecularConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "PanoramicSkyboxConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "ProceduralSkyboxConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "UnlitConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
+                    return entry;
+                case "UnlitTransparentConverter":
+                    entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
+                    entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
                     return entry;
             }
 
@@ -433,6 +550,11 @@ namespace BluWizard.Hierarchy
             s_CsIconsLoaded = true;
         }
 
+        /// <summary>
+        /// This Resolver has to make sure UdonSharpBehaviour components render correctly if the script
+        /// doesn't supply it's own icon. VRChat has a very cursed way of managing UdonSharpBehaviours
+        /// so this is my way of handling that.
+        /// </summary>
         private static Texture2D ResolveUdonSharpIcon(MonoBehaviour mb, bool showTooltip, ref string tooltip)
         {
             var monoScript = MonoScript.FromMonoBehaviour(mb);
@@ -461,6 +583,12 @@ namespace BluWizard.Hierarchy
             return icon != null ? icon : Resources.Load<Texture2D>("Icons/vrcUdonSharpBehaviour");
         }
 
+        /// <summary>
+        /// This portion switches the Icon for specific VRChat SDK Components to reflect the shape their
+        /// component reflects, such as Phys Bone Colliders and Contact Senders/Receivers.
+        /// 
+        /// If the VRChat SDK is not present, this Resolver will simply do nothing.
+        /// </summary>
         private static Texture2D ResolveIconForComponent(Component component, Type t, bool isDarkTheme, ref string tooltip)
         {
             var entry = GetIconEntry(t);
