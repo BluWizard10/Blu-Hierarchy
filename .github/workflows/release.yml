@@ -37,6 +37,39 @@ jobs:
             exit 1
           fi
           echo "Tag and package.json version match: $VERSION"
+      
+      - name: Changelog Entry
+        id: changelog
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.prop }}
+          NOTES_PATH: ${{ runner.temp }}/release-notes.md
+        run: |
+          echo "notesPath=$NOTES_PATH" >> $GITHUB_OUTPUT
+
+          if [ ! -f CHANGELOG.md ]; then
+            echo "::warning::CHANGELOG.md not found. Falling back to auto-generated release notes."
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Grab everything between "# [<version>]" and the next "# [" heading,
+          # then strip any leading blank lines.
+          awk -v ver="$VERSION" '
+            $0 == "# [" ver "]" { found = 1; next }
+            found && /^# \[/    { exit }
+            found               { print }
+          ' CHANGELOG.md | sed -e '/./,$!d' > "$NOTES_PATH"
+
+          if [ ! -s "$NOTES_PATH" ]; then
+            echo "::warning::No CHANGELOG.md entry found for '# [$VERSION]'. Falling back to auto-generated release notes."
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "found=true" >> $GITHUB_OUTPUT
+          echo "Release notes for $VERSION:"
+          cat "$NOTES_PATH"
 
       - name: Set Environment Variables
         run: |
@@ -64,6 +97,8 @@ jobs:
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
           tag_name: ${{ steps.version.outputs.prop }}
+          body_path: ${{ steps.changelog.outputs.found == 'true' && steps.changelog.outputs.notesPath || '' }}
+          generate_release_notes: ${{ steps.changelog.outputs.found != 'true' }}
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
