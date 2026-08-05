@@ -20,11 +20,13 @@ Compared to other systems, this one is intended to match the Editor UI without b
 - Alternate Icons with darker color tone if using the Light Theme.
 - Relationship Lines showing an object's connection to it's parent and child objects.
 - Settings Panel located in `Tools -> BluWizard LABS -> Enhanced Hierarchy Settings` to customize how the system should operate. Settings are persistent across Unity Projects.
+- Supports Unity 2019.4 thru Unity 6.5.
+  - *On Unity 6.5 and newer, the New Hierarchy window is currently in preview and is unsupported at this time.*
 
 ## Benefits:
-- No DLLs, no BS!
-- Free!
-- Open Source!
+- No DLLs!
+- No BS!
+- Free and Open Source Software!
 
 I've designed my Hierarchy System to be Free and Open Source. I did this because I feel it's only right for something like this... something that can make the lives of game development just that much easier to organize without having to pay for it, and without having to dissect a DLL just to add a new feature to it. That's the main reason for designing this system in the first place. Please use my code and edit it to how you want to use it... it's Open Source after all!
 

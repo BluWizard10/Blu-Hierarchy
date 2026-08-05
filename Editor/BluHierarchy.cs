@@ -1,5 +1,10 @@
 using UnityEngine;
 using UnityEditor;
+#if UNITY_6000_4_OR_NEWER
+using HierarchyItemId = UnityEngine.EntityId;
+#else
+using HierarchyItemId = System.Int32;
+#endif
 
 namespace BluWizard.Hierarchy
 {
@@ -9,19 +14,28 @@ namespace BluWizard.Hierarchy
         static BluHierarchy()
         {
             // Subscribe to the Editor's hierarchy window item callback
+#if UNITY_6000_4_OR_NEWER
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += OnHierarchyGUI;
+#else
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyGUI;
+#endif
         }
 
-        private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
+        private static void OnHierarchyGUI(HierarchyItemId itemID, Rect selectionRect)
         {
             bool drawIconsNow = ComponentIcons.ShouldDrawIconsNow;
 
-            // Convert the instance ID to a GameObject
-            GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+            // Convert the Hierarchy itemID to a GameObject.
+            // EntityIdToObject exists from 6.3 onward.
+#if UNITY_6000_3_OR_NEWER
+            GameObject go = EditorUtility.EntityIdToObject(itemID) as GameObject;
+#else
+            GameObject go = EditorUtility.InstanceIDToObject(itemID) as GameObject;
+#endif
             if (go == null)
             {
                 // Scene Headers are not GameObjects. If the Hierarchy item is a Scene header, draw Scene buttons.
-                SceneHeader.Draw(instanceID, selectionRect);
+                SceneHeader.Draw(itemID, selectionRect);
                 return;
             }
 

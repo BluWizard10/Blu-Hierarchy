@@ -3,20 +3,25 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_6000_4_OR_NEWER
+using HierarchyItemId = UnityEngine.EntityId;
+#else
+using HierarchyItemId = System.Int32;
+#endif
 
 namespace BluWizard.Hierarchy
 {
     internal static class SceneHeader
     {
-        public static void Draw(int instanceID, Rect selectionRect)
+        public static void Draw(HierarchyItemId itemID, Rect selectionRect)
         {
             if (!ShouldShowSceneHeaderButtons()) return;
             
-            // Scene Headers can come through as a Scene handle (instanceID) -> GetSceneByHandle
-            // OR as a SceneAsset object -> InstanceIDToObject to return SceneAsset.
+            // Scene Headers can come through as a Scene handle (itemID) -> GetSceneByHandle
+            // OR as a SceneAsset object -> resolve the ID to return SceneAsset.
             // We support both and gracefully no-op if neither matches.
             Scene scene;
-            bool hasScene = TryGetSceneFromHierarchyItem(instanceID, out scene);
+            bool hasScene = TryGetSceneFromHierarchyItem(itemID, out scene);
 
             string scenePath = hasScene ? scene.path : null;
             SceneAsset sceneAsset = null;
@@ -24,7 +29,11 @@ namespace BluWizard.Hierarchy
             if (!hasScene)
             {
                 // If no scene handle, try SceneAsset
-                UnityEngine.Object obj = EditorUtility.InstanceIDToObject(instanceID);
+#if UNITY_6000_3_OR_NEWER
+                UnityEngine.Object obj = EditorUtility.EntityIdToObject(itemID);
+#else
+                UnityEngine.Object obj = EditorUtility.InstanceIDToObject(itemID);
+#endif
                 sceneAsset = obj as SceneAsset;
                 if (sceneAsset == null) return;
 
@@ -148,13 +157,26 @@ namespace BluWizard.Hierarchy
             return false;
         }
 
-        private static bool TryGetSceneFromHierarchyItem(int instanceID, out Scene scene)
+        private static bool TryGetSceneFromHierarchyItem(HierarchyItemId itemID, out Scene scene)
         {
+#if UNITY_6000_4_OR_NEWER
+            // Scene.handle became SceneHandle in 6.3, and 6.4 obsoleted the implicit SceneHandle(int) operator.
+            // SceneHandle wraps an EntityId, but From(EntityId)/ToEntityId() are internal, so the raw-data
+            // round trip is the only public route. Unity warns this representation may change between
+            // versions - if it ever breaks, this line is the single place to fix it.
+            UnityEngine.SceneManagement.SceneHandle target = UnityEngine.SceneManagement.SceneHandle.FromRawData(EntityId.ToULong(itemID));
+#endif
             int count = EditorSceneManager.sceneCount;
             for (int i = 0; i < count; i++)
             {
                 Scene s = EditorSceneManager.GetSceneAt(i);
-                if (s.IsValid() && s.handle == instanceID)
+                if (!s.IsValid()) continue;
+
+#if UNITY_6000_4_OR_NEWER
+                if (s.handle == target)
+#else
+                if (s.handle == itemID)
+#endif
                 {
                     scene = s;
                     return true;
