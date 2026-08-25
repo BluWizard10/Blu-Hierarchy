@@ -1,3 +1,8 @@
+# [1.14.0]
+- **Added Alternating Rows**
+  - Applies a subtle grayscale tint to every other row, like a spreadsheet.
+  - Enable this feature by toggling `Tools -> BluWizard LABS -> Enhanced Hierarchy Settings -> Tint Grayscale per Row`.
+
 # [1.12.1]
 - Fixed support for Unity 6.3 and newer.
 - Added Icons for Resonite SDK components.

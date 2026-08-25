@@ -1,9 +1,9 @@
 {
   "name": "net.bluwizard.hierarchy",
-  "version": "1.12.1",
+  "version": "1.14.0",
   "displayName": "BluWizard LABS - Enhanced Hierarchy System",
   "unity": "2019.4",
-  "description": "Blu's personal editor enhancement system that introduces an improved Hierarchy look, tailored made for VRChat Creators.",
+  "description": "Blu's personal editor enhancement system that introduces an improved Hierarchy look for Unity, tailored made for VRChat Creators.",
   "changelogUrl": "https://github.com/BluWizard10/Blu-Hierarchy/blob/main/CHANGELOG.md",
   "gitDependencies": {},
   "vpmDependencies": {},

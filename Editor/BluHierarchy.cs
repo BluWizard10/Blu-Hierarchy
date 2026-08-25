@@ -25,6 +25,10 @@ namespace BluWizard.Hierarchy
         {
             bool drawIconsNow = ComponentIcons.ShouldDrawIconsNow;
 
+            // ---------- ALTERNATING ROW COLORING ----------
+            // Drawn first so every row (GameObjects and Scene headers alike) get banded.
+            AlternateRows.Draw(selectionRect);
+
             // Convert the Hierarchy itemID to a GameObject.
             // EntityIdToObject exists from 6.3 onward.
 #if UNITY_6000_3_OR_NEWER

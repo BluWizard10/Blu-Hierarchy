@@ -19,6 +19,7 @@ Compared to other systems, this one is intended to match the Editor UI without b
 - Tooltips when hovering over icons, telling you what they are at a glance.
 - Alternate Icons with darker color tone if using the Light Theme.
 - Relationship Lines showing an object's connection to it's parent and child objects.
+- Alternating Rows, applying a subtle grayscale tint to every other row like a spreadsheet.
 - Settings Panel located in `Tools -> BluWizard LABS -> Enhanced Hierarchy Settings` to customize how the system should operate. Settings are persistent across Unity Projects.
 - Supports Unity 2019.4 thru Unity 6.5.
   - *On Unity 6.5 and newer, the New Hierarchy window is currently in preview and is unsupported at this time.*

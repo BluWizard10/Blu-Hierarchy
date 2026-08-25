@@ -14,6 +14,7 @@ namespace BluWizard.Hierarchy
         private const int PRI_LayerNames = 30;
         private const int PRI_TagNames = 32;
         private const int PRI_RelationshipLines = 35;
+        private const int PRI_AlternateRowColors = 37;
         private const int PRI_HiddenComponents = 40;
         private const int PRI_Tooltips = 50;
         private const int PRI_DragToToggle = 60;
@@ -77,6 +78,16 @@ namespace BluWizard.Hierarchy
             return true;
         }
 
+        // Alternate Row Colors Toggle
+        [MenuItem(Root + "Tint Grayscale per Row", false, PRI_AlternateRowColors)]
+        private static void M_AlternateRows() => Toggle(() => Settings.ShowAlternateRows, v => Settings.ShowAlternateRows = v, Root + "Tint Grayscale per Row");
+        [MenuItem(Root + "Tint Grayscale per Row", true)]
+        private static bool V_AlternateRows()
+        {
+            Menu.SetChecked(Root + "Tint Grayscale per Row", Settings.ShowAlternateRows);
+            return true;
+        }
+
         // Hidden Components Toggle
         [MenuItem(Root + "Show Hidden Components", false, PRI_HiddenComponents)]
         private static void M_ShowHiddenComponents() => Toggle(() => Settings.ShowHiddenComponents, v => Settings.ShowHiddenComponents = v, Root + "Show Hidden Components");
@@ -130,6 +141,7 @@ namespace BluWizard.Hierarchy
                 V_ShowLayerNames();
                 V_ShowTagNames();
                 V_ShowRelationshipLines();
+                V_AlternateRows();
                 V_ShowHiddenComponents();
                 V_ShowTooltips();
                 V_EnableDragToToggle();

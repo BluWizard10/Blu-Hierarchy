@@ -13,6 +13,7 @@ namespace BluWizard.Hierarchy
         private const string EnableDragToToggleKey = "BluHierarchy_EnableDragToToggle";
         private const string ShowIconsInPlayModeKey = "BluHierarchy_ShowIconsInPlayMode";
         private const string ShowRelationshipLinesKey = "BluHierarchy_ShowRelationshipLines";
+        private const string ShowAlternateRowsKey = "BluHierarchy_ShowAlternateRows";
 
         public static bool ShowTransformIcon
         {
@@ -68,6 +69,12 @@ namespace BluWizard.Hierarchy
             set => EditorPrefs.SetBool(ShowRelationshipLinesKey, value);
         }
 
+        public static bool ShowAlternateRows
+        {
+            get => EditorPrefs.GetBool(ShowAlternateRowsKey, false);
+            set => EditorPrefs.SetBool(ShowAlternateRowsKey, value);
+        }
+
         public static void ResetToDefaults(bool repaint = true)
         {
             string[] keys =
@@ -81,6 +88,7 @@ namespace BluWizard.Hierarchy
                 EnableDragToToggleKey,
                 ShowIconsInPlayModeKey,
                 ShowRelationshipLinesKey,
+                ShowAlternateRowsKey,
             };
 
             foreach (var k in keys) EditorPrefs.DeleteKey(k);
