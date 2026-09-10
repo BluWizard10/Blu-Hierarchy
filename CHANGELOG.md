@@ -1,6 +1,3 @@
-# [1.14.1]
-- Nothing in this release for now. The only change is that SHA256 Checksums are now generated on released packages starting with this one.
-
 # [1.14.0]
 - **Added Alternating Rows**
   - Applies a subtle grayscale tint to every other row, like a spreadsheet.

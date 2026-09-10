@@ -92,61 +92,13 @@ jobs:
               -x  ".git/*" ".git" "*/.github/*" \
                   ".github/*" ".github" "*/.github/*" \
                   ".gitignore" ".gitattributes" ".gitmodules"
-      
-      - name: Generate SHA256 Checksums
-        id: checksums
-        shell: bash
-        env:
-          VERSION: ${{ steps.version.outputs.prop }}
-          NOTES_PATH: ${{ steps.changelog.outputs.notesPath }}
-          NOTES_FOUND: ${{ steps.changelog.outputs.found }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-
-          # sha256sum-compatible manifest, shipped as a release asset.
-          sha256sum "$zipFile" "$unityPackage" package.json > checksums.txt
-          echo "SHA256 checksums:"
-          cat checksums.txt
-
-          # The checksum table gets appended to the release body, so the body has to
-          # exist first. When there is no CHANGELOG entry, ask GitHub for the
-          # auto-generated notes up front rather than letting the release action add
-          # them afterwards, otherwise the checksums would land above them.
-          letGitHubGenerate=false
-          if [ "$NOTES_FOUND" != "true" ]; then
-            if gh api --method POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
-                 -f tag_name="$VERSION" --jq '.body' > "$NOTES_PATH"; then
-              printf '\n' >> "$NOTES_PATH"
-            else
-              echo "::warning::Could not pre-generate release notes; they will be appended after the checksums."
-              : > "$NOTES_PATH"
-              letGitHubGenerate=true
-            fi
-          fi
-
-          {
-            echo ""
-            echo "## SHA256 Checksums"
-            echo ""
-            echo "| File | SHA256 |"
-            echo "| --- | --- |"
-            while read -r hash name; do
-              # sha256sum flags binary-mode entries with a leading "*"; keep it out of the table.
-              printf '| `%s` | `%s` |\n' "${name#[*]}" "$hash"
-            done < checksums.txt
-            echo ""
-            echo "Download \`checksums.txt\` into the same folder as the other assets and run \`sha256sum -c checksums.txt\` (macOS: \`shasum -a 256 -c checksums.txt\`) to verify them."
-          } >> "$NOTES_PATH"
-
-          echo "letGitHubGenerate=$letGitHubGenerate" >> $GITHUB_OUTPUT
 
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
           tag_name: ${{ steps.version.outputs.prop }}
-          body_path: ${{ steps.changelog.outputs.notesPath }}
-          generate_release_notes: ${{ steps.checksums.outputs.letGitHubGenerate == 'true' }}
+          body_path: ${{ steps.changelog.outputs.found == 'true' && steps.changelog.outputs.notesPath || '' }}
+          generate_release_notes: ${{ steps.changelog.outputs.found != 'true' }}
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
