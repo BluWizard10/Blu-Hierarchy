@@ -1,3 +1,6 @@
+# [1.14.2]
+- Added some icons for known BasisVR components.
+
 # [1.14.1]
 - Nothing in this release for now. The only change is that SHA256 Checksums are now generated on released packages starting with this one.
 
