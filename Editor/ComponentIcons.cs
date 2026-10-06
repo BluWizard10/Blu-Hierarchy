@@ -507,6 +507,48 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/ydmResoniteComponent");
                     entry.light = Resources.Load<Texture2D>("icons/ydmResoniteComponent_L");
                     return entry;
+                
+                // Known BasisVR Components
+                case "BasisAvatar":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisAvatar");
+                    entry.light = entry.dark;
+                    return entry;
+                case "JiggleRig":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisJiggleRig");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisAuthoredMotion":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisAuthoredMotion");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisParentConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisParentConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisParentConstraint_L");
+                    return entry;
+                case "BasisPositionConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisPositionConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisPositionConstraint_L");
+                    return entry;
+                case "BasisRotationConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisRotationConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisRotationConstraint_L");
+                    return entry;
+                case "BasisScaleConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisScaleConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisScaleConstraint_L");
+                    return entry;
+                case "BasisAimConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisAimConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisAimConstraint_L");
+                    return entry;
+                case "BasisLookAtConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLookAtConstraint");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisLookAtConstraint_L");
+                    return entry;
+                case "BasisBlendConstraint":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisBlendConstraint");
+                    entry.light = entry.dark;
+                    return entry;
             }
 
             return entry;
