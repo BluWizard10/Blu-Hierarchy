@@ -513,6 +513,14 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/basisAvatar");
                     entry.light = entry.dark;
                     return entry;
+                case "BasisScene":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisScene");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisProp":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisProp");
+                    entry.light = entry.dark;
+                    return entry;
                 case "JiggleRig":
                     entry.dark = Resources.Load<Texture2D>("Icons/basisJiggleRig");
                     entry.light = entry.dark;
@@ -547,6 +555,62 @@ namespace BluWizard.Hierarchy
                     return entry;
                 case "BasisBlendConstraint":
                     entry.dark = Resources.Load<Texture2D>("Icons/basisBlendConstraint");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisChainIK":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisChainIK");
+                    entry.light = Resources.Load<Texture2D>("Icons/basisChainIK_L");
+                    return entry;
+                case "BasisAvatarPedestal":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisAvatarPedestal");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisDampedTransform":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMultiReferential":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisOverrideTransform":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisTwistChain":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisTwistCorrection":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisTwoBoneIK":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayer":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisMediaPlayer");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayerAudio":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisMediaAudio");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayerDiagnostics":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayerNetworking":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisLogo");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayerPlaylist":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisMediaPlayer");
+                    entry.light = entry.dark;
+                    return entry;
+                case "BasisMediaPlayerStreaming":
+                    entry.dark = Resources.Load<Texture2D>("Icons/basisMediaPlayer");
                     entry.light = entry.dark;
                     return entry;
             }

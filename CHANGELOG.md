@@ -1,3 +1,6 @@
+# [1.14.3]
+- Added more icons for known BasisVR components. Will add more later!
+
 # [1.14.2]
 - Added some icons for known BasisVR components.
 
