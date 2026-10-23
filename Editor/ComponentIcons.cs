@@ -171,6 +171,18 @@ namespace BluWizard.Hierarchy
                     entry.dark = Resources.Load<Texture2D>("Icons/vrcCameraDollyPoint");
                     entry.light = Resources.Load<Texture2D>("Icons/vrcCameraDollyPoint_L");
                     return entry;
+                case "VRCBillboard":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcBillboard");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcBillboard_L");
+                    return entry;
+                case "VRCVelocityTracker":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcVelocityTracker");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcVelocityTracker_L");
+                    return entry;
+                case "VRCPlacementZone":
+                    entry.dark = Resources.Load<Texture2D>("Icons/vrcPlacementZone");
+                    entry.light = Resources.Load<Texture2D>("Icons/vrcPlacementZone_L");
+                    return entry;
 
                 /// <summary>
                 /// VRChat Base SDK

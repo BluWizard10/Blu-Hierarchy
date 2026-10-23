@@ -1,5 +1,7 @@
 # [1.14.3]
+- Added icons for new VRC components introduced in VRChat SDK 3.10.6.
 - Added more icons for known BasisVR components. Will add more later!
+- Improved VRC Constraint icons for better clarity. They look a lot better now.
 
 # [1.14.2]
 - Added some icons for known BasisVR components.
